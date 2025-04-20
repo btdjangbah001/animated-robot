@@ -1,0 +1,141 @@
+import { create } from 'zustand';
+import axiosInstance from '@/lib/axios';
+import { AxiosError } from 'axios';
+import {ApplicantOutput, ApplicationOutput} from "@/types/applicant";
+
+interface OptionType {
+    id: number;
+    title: string;
+}
+
+interface ApplicationState {
+    application: ApplicationOutput | null;
+    applicationId: number | null;
+    isLoading: boolean;
+    error: string | null;
+    programTypes: OptionType[];
+    institutions: OptionType[];
+    programs: OptionType[];
+    isLoadingProgramTypes: boolean;
+    isLoadingInstitutions: boolean;
+    isLoadingPrograms: boolean;
+    dropdownError: string | null;
+}
+
+interface ApplicationActions {
+    fetchApplication: () => Promise<void>;
+    updateApplication: (payload: Partial<ApplicationOutput>) => Promise<boolean>;
+    setLoading: (isLoading: boolean) => void;
+    setError: (error: string | null) => void;
+    clearApplication: () => void;
+    // New actions for dropdowns
+    fetchProgramTypes: () => Promise<void>;
+    fetchInstitutions: (programTypeId: number | string) => Promise<void>;
+    fetchPrograms: (programTypeId: number | string, institutionId: number | string) => Promise<void>;
+    clearInstitutions: () => void;
+    clearPrograms: () => void;
+}
+
+interface ApplicationStore extends ApplicationState, ApplicationActions {}
+
+const useApplicationStore = create<ApplicationStore>((set, get) => ({
+    application: null,
+    applicationId: null,
+    isLoading: false,
+    error: null,
+    programTypes: [],
+    institutions: [],
+    programs: [],
+    isLoadingProgramTypes: false,
+    isLoadingInstitutions: false,
+    isLoadingPrograms: false,
+    dropdownError: null,
+
+    setLoading: (isLoading) => set({ isLoading }),
+    setError: (error) => set({ error }),
+    clearApplication: () => set({
+        application: null, applicationId: null, isLoading: false, error: null,
+        programTypes: [], institutions: [], programs: [], dropdownError: null,
+        isLoadingProgramTypes: false, isLoadingInstitutions: false, isLoadingPrograms: false
+    }),
+
+    fetchApplication: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axiosInstance.get<ApplicationOutput>('/api/v1.0/applications');
+            const appData = response.data;
+            set({
+                application: appData,
+                applicationId: appData?.id ?? null,
+                isLoading: false,
+            });
+        } catch (error) {
+            console.error("Failed to fetch application:", error);
+            set({ isLoading: false, error: "Failed to load application data.", application: null, applicationId: null });
+        }
+    },
+
+    updateApplication: async (payload: Partial<ApplicantOutput>): Promise<boolean> => {
+        const currentId = get().applicationId;
+        if (!currentId) {
+            set({ error: "Application ID is missing. Cannot update." });
+            return false;
+        }
+        set({ isLoading: true, error: null });
+        try {
+            await axiosInstance.put(`/api/v1.0/applications/${currentId}`, payload);
+            await get().fetchApplication();
+            set({ isLoading: false });
+            return true;
+        } catch (error) {
+            console.error("Failed to update application:", error);
+            let message = "Failed to save application progress.";
+            if (error instanceof AxiosError && error.response?.data?.message) {
+                message = error.response.data.message;
+            }
+            set({ isLoading: false, error: message });
+            return false;
+        }
+    },
+
+    fetchProgramTypes: async () => {
+        set({ isLoadingProgramTypes: true, dropdownError: null });
+        try {
+            const response = await axiosInstance.post('/api/v1.0/program-types/search', {}, { params: { size: 100 } });
+            set({ programTypes: response.data?.content || [], isLoadingProgramTypes: false });
+        } catch (error) {
+            console.error("Failed to fetch program types:", error);
+            set({ isLoadingProgramTypes: false, dropdownError: "Failed to load program types." });
+        }
+    },
+
+    fetchInstitutions: async (programTypeId) => {
+        if (!programTypeId) return;
+        set({ isLoadingInstitutions: true, institutions: [], programs: [], dropdownError: null });
+        try {
+            const response = await axiosInstance.get(`/api/v1.0/institutions/by-program-type/${Number(programTypeId)}`);
+            set({ institutions: response.data || [], isLoadingInstitutions: false });
+        } catch (error) {
+            console.error("Failed to fetch institutions:", error);
+            set({ isLoadingInstitutions: false, dropdownError: "Failed to load institutions." });
+        }
+    },
+
+    fetchPrograms: async (programTypeId, institutionId) => {
+        if (!programTypeId || !institutionId) return;
+        set({ isLoadingPrograms: true, programs: [], dropdownError: null });
+        try {
+            const response = await axiosInstance.get(`/api/v1.0/programs/by-program-type/${Number(programTypeId)}/institution/${Number(institutionId)}`);
+            set({ programs: response.data || [], isLoadingPrograms: false });
+        } catch (error) {
+            console.error("Failed to fetch programs:", error);
+            set({ isLoadingPrograms: false, dropdownError: "Failed to load programs." });
+        }
+    },
+
+    clearInstitutions: () => set({ institutions: [], programs: [] }),
+    clearPrograms: () => set({ programs: [] }),
+
+}));
+
+export default useApplicationStore;
