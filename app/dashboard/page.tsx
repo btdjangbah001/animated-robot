@@ -8,10 +8,6 @@ export default function DashboardPage() {
   const admissionYear = "2025/2026";
   const admissionPrice = "GHS 500.00";
 
-  const handleProceedPayment = (mobileMoneyNumber: string) => {
-    console.log("Proceeding with payment for:", mobileMoneyNumber);
-  };
-
   return (
     <div className="min-h-screen bg-gray-100 p-4 sm:p-8 flex flex-col items-center">
       <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-md space-y-6">
@@ -47,7 +43,7 @@ export default function DashboardPage() {
             </DialogTrigger>
           </div>
 
-          <PaymentDialogContent onProceed={handleProceedPayment} />
+          <PaymentDialogContent />
         </Dialog>
       </div>
     </div>
