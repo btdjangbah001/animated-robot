@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import axiosInstance from '@/lib/axios';
 import { AxiosError } from 'axios';
-import {ApplicantOutput, ApplicationOutput} from "@/types/applicant";
+import {ApplicantOutput, ApplicationOutput, SubjectOutput} from "@/types/applicant";
+import {ApplicationInput} from "@/types/application";
 
 interface OptionType {
     id: number;
-    title: string;
+    title?: string;
+    name?: string;
 }
 
 interface ApplicationState {
@@ -20,11 +22,15 @@ interface ApplicationState {
     isLoadingInstitutions: boolean;
     isLoadingPrograms: boolean;
     dropdownError: string | null;
+    waecCourses: OptionType[];
+    isLoadingWaecCourses: boolean;
+    coreSubjectsOptions: SubjectOutput[];
+    isLoadingCoreSubjects: boolean;
 }
 
 interface ApplicationActions {
     fetchApplication: () => Promise<void>;
-    updateApplication: (payload: Partial<ApplicationOutput>) => Promise<boolean>;
+    updateApplication: (payload: Partial<ApplicationInput>) => Promise<boolean>;
     setLoading: (isLoading: boolean) => void;
     setError: (error: string | null) => void;
     clearApplication: () => void;
@@ -34,6 +40,8 @@ interface ApplicationActions {
     fetchPrograms: (programTypeId: number | string, institutionId: number | string) => Promise<void>;
     clearInstitutions: () => void;
     clearPrograms: () => void;
+    fetchWaecCourses: () => Promise<void>;
+    fetchCoreSubjects: () => Promise<void>;
 }
 
 interface ApplicationStore extends ApplicationState, ApplicationActions {}
@@ -50,13 +58,18 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
     isLoadingInstitutions: false,
     isLoadingPrograms: false,
     dropdownError: null,
+    waecCourses: [],
+    isLoadingWaecCourses: false,
+    coreSubjectsOptions: [],
+    isLoadingCoreSubjects: false,
 
     setLoading: (isLoading) => set({ isLoading }),
     setError: (error) => set({ error }),
     clearApplication: () => set({
         application: null, applicationId: null, isLoading: false, error: null,
         programTypes: [], institutions: [], programs: [], dropdownError: null,
-        isLoadingProgramTypes: false, isLoadingInstitutions: false, isLoadingPrograms: false
+        isLoadingProgramTypes: false, isLoadingInstitutions: false, isLoadingPrograms: false,
+        coreSubjectsOptions: [], isLoadingCoreSubjects: false
     }),
 
     fetchApplication: async () => {
@@ -135,6 +148,32 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
 
     clearInstitutions: () => set({ institutions: [], programs: [] }),
     clearPrograms: () => set({ programs: [] }),
+
+    fetchWaecCourses: async () => {
+        set({ isLoadingWaecCourses: true, dropdownError: null });
+        try {
+            const response = await axiosInstance.post('/api/v1.0/waec-courses/search', {}, { params: { size: 100 } });
+            const formattedCourses = response.data?.content?.map((c: any) => ({ id: c.id, title: c.name })) || [];
+            set({ waecCourses: formattedCourses, isLoadingWaecCourses: false });
+        } catch (error) {
+            console.error("Failed to fetch WAEC courses:", error);
+            set({ isLoadingWaecCourses: false, dropdownError: "Failed to load WAEC courses." });
+        }
+    },
+
+    fetchCoreSubjects: async () => {
+        set({ isLoadingCoreSubjects: true, dropdownError: null });
+        try {
+            const queryPayload = {
+                where: [{ leftHand: {value: "core"}, matchMode: "EQUAL", rightHand: {value: "true"}, operator: "AND" } ]
+            };
+            const response = await axiosInstance.post('/api/v1.0/subjects/search', queryPayload, { params: { size: 10 } });
+            set({ coreSubjectsOptions: response.data?.content || [], isLoadingCoreSubjects: false });
+        } catch (error) {
+            console.error("Failed to fetch core subjects:", error);
+            set({ isLoadingCoreSubjects: false, dropdownError: "Failed to load core subjects." });
+        }
+    },
 
 }));
 
