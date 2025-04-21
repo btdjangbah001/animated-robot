@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import useUserStore from "@/store/applicantStore";
 import axiosInstance from "@/lib/axios";
 import { Loader2 } from "lucide-react";
-
-const REDIRECT_DELAY = 4000;
+import { Button } from "@/components/ui/button";
 
 export default function CheckStatusPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
   const invoiceNumber = useUserStore((state) => state.invoiceNumber);
 
@@ -21,7 +21,7 @@ export default function CheckStatusPage() {
           "Error: Invoice number not found. Unable to check status"
         );
         setIsLoading(false);
-        setTimeout(() => router.push("/dashboard"), REDIRECT_DELAY);
+        setIsSuccess(false);
         return;
       }
 
@@ -30,37 +30,45 @@ export default function CheckStatusPage() {
 
       try {
         const response = await axiosInstance.post(
-          `/api/v1.0/invoices/check-status?invoiceNumber=${invoiceNumber}`
+          `/api/v1.0/public/check-status?invoiceNumber=${invoiceNumber}`
         );
 
-        const paymentStatus = response.data?.status;
+        const paymentStatus = response.data?.transactionStatus;
 
         if (paymentStatus === "PAID") {
-          setStatusMessage("Payment Successful! Redirecting...");
-          router.push("/dashboard");
-          return;
+          setStatusMessage(
+            "Payment Successful! Your serial number and pin will be sent to your email."
+          );
+          setIsSuccess(true);
+          setIsLoading(false);
         } else {
           const errorMessage = `Payment status: ${
             paymentStatus || "Unknown"
-          }. Please try again or contact support. Redirecting...`;
+          }. Please try again or contact support.`;
           setStatusMessage(`Error: ${errorMessage}`);
+          setIsSuccess(false);
           setIsLoading(false);
-          setTimeout(() => router.push("/dashboard"), REDIRECT_DELAY);
         }
       } catch (error: any) {
         const apiErrorMessage =
           error.response?.data?.message || error.message || "Unknown error";
-        setStatusMessage(
-          `Error checking payment status: ${apiErrorMessage}. Redirecting...`
-        );
+        setStatusMessage(`Error checking payment status: ${apiErrorMessage}.`);
+        setIsSuccess(false);
         setIsLoading(false);
-        setTimeout(() => router.push("/dashboard"), REDIRECT_DELAY);
       }
     };
 
     checkPaymentStatus();
     return () => {};
   }, [invoiceNumber, router]);
+
+  const handleOkClick = () => {
+    router.push("/dashboard"); // TODO: @bernard on success, we should route them to some page. hopefully the login page
+  };
+
+  const handleTryAgainClick = () => {
+    router.push("/dashboard");
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4 text-center">
@@ -79,13 +87,28 @@ export default function CheckStatusPage() {
           </h1>
           <p
             className={`text-lg ${
-              statusMessage.toLowerCase().startsWith("error:")
-                ? "text-red-600"
-                : "text-gray-700"
+              isSuccess ? "text-green-700" : "text-red-600"
             }`}
           >
             {statusMessage}
           </p>
+          {isSuccess && (
+            <Button
+              onClick={handleOkClick}
+              className="mt-6 bg-green-600 hover:bg-green-700 text-white"
+            >
+              OK
+            </Button>
+          )}
+          {!isSuccess && (
+            <Button
+              onClick={handleTryAgainClick}
+              variant="outline"
+              className="mt-6"
+            >
+              Try Again
+            </Button>
+          )}
         </div>
       )}
     </div>
