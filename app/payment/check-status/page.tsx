@@ -29,8 +29,8 @@ export default function CheckStatusPage() {
       setStatusMessage("Checking payment status...");
 
       try {
-        const response = await axiosInstance.get(
-          `/api/v1.0/public/check-status?invoiceNumber=${invoiceNumber}`
+        const response = await axiosInstance.post(
+          `/api/v1.0/invoices/check-status?invoiceNumber=${invoiceNumber}`
         );
 
         const paymentStatus = response.data?.status;
