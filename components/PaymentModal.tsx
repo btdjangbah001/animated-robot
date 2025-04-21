@@ -43,7 +43,7 @@ export const PaymentDialogContent: React.FC<PaymentModalProps> = () => {
 
     try {
       const response = await axiosInstance.post(
-        "/api/v1.0/public/make-payment",
+        "/public/make-payment",
         {
           firstName: firstName,
           lastName: lastName,

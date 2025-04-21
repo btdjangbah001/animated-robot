@@ -14,60 +14,60 @@ export default function CheckStatusPage() {
   const router = useRouter();
   const invoiceNumber = useUserStore((state) => state.invoiceNumber);
 
-  useEffect(() => {
-    const checkPaymentStatus = async () => {
-      if (!invoiceNumber) {
+  const checkPaymentStatus = async () => {
+    if (!invoiceNumber) {
+      setStatusMessage(
+        "Error: Invoice number not found. Unable to check status"
+      );
+      setIsLoading(false);
+      setIsSuccess(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setStatusMessage("Checking payment status...");
+
+    try {
+      const response = await axiosInstance.post(
+        `/public/check-status?invoiceNumber=${invoiceNumber}`
+      );
+
+      const paymentStatus = response.data?.transactionStatus;
+
+      if (paymentStatus === "PAID") {
         setStatusMessage(
-          "Error: Invoice number not found. Unable to check status"
+          "Payment Successful! Your serial number and pin will be sent to your email."
         );
+        setIsSuccess(true);
         setIsLoading(false);
-        setIsSuccess(false);
-        return;
-      }
-
-      setIsLoading(true);
-      setStatusMessage("Checking payment status...");
-
-      try {
-        const response = await axiosInstance.post(
-          `/api/v1.0/public/check-status?invoiceNumber=${invoiceNumber}`
-        );
-
-        const paymentStatus = response.data?.transactionStatus;
-
-        if (paymentStatus === "PAID") {
-          setStatusMessage(
-            "Payment Successful! Your serial number and pin will be sent to your email."
-          );
-          setIsSuccess(true);
-          setIsLoading(false);
-        } else {
-          const errorMessage = `Payment status: ${
-            paymentStatus || "Unknown"
-          }. Please try again or contact support.`;
-          setStatusMessage(`Error: ${errorMessage}`);
-          setIsSuccess(false);
-          setIsLoading(false);
-        }
-      } catch (error: any) {
-        const apiErrorMessage =
-          error.response?.data?.message || error.message || "Unknown error";
-        setStatusMessage(`Error checking payment status: ${apiErrorMessage}.`);
+      } else {
+        const errorMessage = `Payment status: ${
+          paymentStatus || "Unknown"
+        }. Please try again or contact support.`;
+        setStatusMessage(`Error: ${errorMessage}`);
         setIsSuccess(false);
         setIsLoading(false);
       }
-    };
+    } catch (error: any) {
+      const apiErrorMessage =
+        error.response?.data?.message || error.message || "Unknown error";
+      setStatusMessage(`Error checking payment status: ${apiErrorMessage}.`);
+      setIsSuccess(false);
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     checkPaymentStatus();
     return () => {};
   }, [invoiceNumber, router]);
 
   const handleOkClick = () => {
-    router.push("/dashboard"); // TODO: @bernard on success, we should route them to some page. hopefully the login page
+    router.push("/portal/login"); // TODO: @bernard on success, we should route them to some page. hopefully the login page
   };
 
   const handleTryAgainClick = () => {
-    router.push("/dashboard");
+    checkPaymentStatus();
   };
 
   return (
