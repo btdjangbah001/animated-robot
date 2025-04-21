@@ -1,0 +1,116 @@
+import React from 'react';
+
+interface PaymentFailedProps {
+  errorMessage?: string;
+  onRetry?: () => void; // New prop for retry action
+}
+
+const PaymentFailed: React.FC<PaymentFailedProps> = ({
+  errorMessage = 'Payment could not be processed',
+  onRetry = () => window.location.href = '/dashboard' // Default redirect
+}) => {
+  return (
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <div style={{ ...styles.icon, color: '#dc3545' }}>✕</div>
+        <h1 style={{ ...styles.title, color: '#dc3545' }}>Payment Failed</h1>
+        
+        <p style={styles.text}>
+          {errorMessage}.
+        </p>
+        
+        <div style={styles.detailsBox}>
+          <p>Possible reasons:</p>
+          <ul style={styles.list}>
+            <li>Insufficient funds</li>
+            <li>Card declined</li>
+            <li>Network issues</li>
+          </ul>
+        </div>
+
+        <div style={styles.actions}>
+          <button onClick={onRetry} style={styles.retryButton}>Retry Payment</button>
+          <button onClick={() => window.location.href = '/dashboard'} style={styles.supportButton}>Go to dashboard</button>
+        </div>
+
+        <div style={styles.footer}>
+          Need immediate help? <br />
+          {/* Email <a href={`mailto:${supportEmail}`} style={styles.link}>{supportEmail}</a> or call {supportPhone} */}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const styles = {
+  container: {
+    fontFamily: "'Arial', sans-serif",
+    maxWidth: '600px',
+    margin: '0 auto',
+    padding: '20px',
+    backgroundColor: '#f9f9f9',
+  },
+  card: {
+    background: '#fff',
+    borderRadius: '8px',
+    padding: '25px',
+    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+    textAlign: 'center' as const,
+  },
+  icon: {
+    fontSize: '48px',
+    margin: '15px 0',
+  },
+  title: {
+    fontSize: '24px',
+    marginBottom: '10px',
+  },
+  text: {
+    lineHeight: 1.6,
+    margin: '15px 0',
+  },
+  detailsBox: {
+    background: '#f8f9fa',
+    padding: '15px',
+    borderRadius: '6px',
+    margin: '20px 0',
+    textAlign: 'left' as const,
+  },
+  list: {
+    paddingLeft: '20px',
+    margin: '10px 0',
+  },
+  actions: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '10px',
+    margin: '20px 0',
+  },
+  retryButton: {
+    padding: '10px 20px',
+    backgroundColor: '#28a745',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  },
+  supportButton: {
+    padding: '10px 20px',
+    backgroundColor: '#6c757d',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  },
+  footer: {
+    marginTop: '20px',
+    fontSize: '14px',
+    color: '#6c757d',
+  },
+  link: {
+    color: '#007bff',
+    textDecoration: 'none',
+  },
+};
+
+export default PaymentFailed;

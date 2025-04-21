@@ -75,6 +75,8 @@ export interface ApplicantOutput {
     paid: boolean | null;
     transactionStatus: "PAID" | "FAILED" | "NO_RECORD" | "PENDING" | string | null;
     contactInformation: ContactInformationData | null;
+    pin: string | null;
+    serialNumber: string | null;
 }
 
 export interface CoreResultOutput {

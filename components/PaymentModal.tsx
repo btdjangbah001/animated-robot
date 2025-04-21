@@ -16,6 +16,8 @@ import { Check } from "lucide-react";
 import axiosInstance from "@/lib/axios";
 import useUserStore from "@/store/applicantStore";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { AxiosError } from "axios";
 
 const GHANA_CARD_REGEX = /^[A-Z]{3}-\d{9}-\d$/;
 
@@ -43,7 +45,7 @@ export const PaymentDialogContent: React.FC<PaymentModalProps> = () => {
 
     try {
       const response = await axiosInstance.post(
-        "/public/make-payment",
+        "/api/v1.0/public/make-payment",
         {
           firstName: firstName,
           lastName: lastName,
@@ -62,8 +64,15 @@ export const PaymentDialogContent: React.FC<PaymentModalProps> = () => {
       } else {
         throw new Error("Missing invoice number from response body");
       }
-    } catch (error) {
-      console.error("Payment failed:", error);
+    } catch (err) {
+      // Handle the API error response
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      if (err instanceof AxiosError) {
+          errorMessage = err.response?.data?.message || err.message || errorMessage;
+      } else if (err instanceof Error) {
+          errorMessage = err.message;
+      }
+      toast.success(errorMessage)
     } finally {
       setIsLoading(false);
     }
