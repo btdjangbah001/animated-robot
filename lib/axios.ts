@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import Cookie from "js-cookie";
 
-const baseURL: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const baseURL: string = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 const nonAuthEndpoints: string[] = [
     '/api/v1.0/auth/login',
