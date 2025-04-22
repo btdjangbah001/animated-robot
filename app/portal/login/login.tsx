@@ -1,19 +1,13 @@
 "use client";
 import * as React from "react";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useRouter } from 'next/navigation';
+import {Eye, EyeOff, Loader2} from "lucide-react";
+import {useRouter} from 'next/navigation';
 import useAuthStore from '@/store/authStore';
-import { Button } from "@/components/ui/button";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AxiosError } from "axios";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {AxiosError} from "axios";
 
 export const Login = () => {
     const [pin, setPin] = React.useState("");
@@ -22,7 +16,6 @@ export const Login = () => {
 
     const login = useAuthStore((state) => state.login);
     const isLoading = useAuthStore((state) => state.isLoading);
-    const error = useAuthStore((state) => state.error);
     const setError = useAuthStore((state) => state.setError);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
@@ -68,13 +61,6 @@ export const Login = () => {
             </CardHeader>
             <CardContent className="p-6 pt-0">
                 <form onSubmit={handleSubmit} className="space-y-6">
-                    {error && (
-                        <Alert variant="destructive">
-                            <AlertTitle>Login Failed</AlertTitle>
-                            <AlertDescription>{error}</AlertDescription>
-                        </Alert>
-                    )}
-
                     <div className="space-y-2">
                         <Label htmlFor="pin" className="text-gray-700">
                             Pin <span className="text-red-500">*</span>

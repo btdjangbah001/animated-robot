@@ -29,7 +29,7 @@ interface ApplicationState {
 }
 
 interface ApplicationActions {
-    fetchApplication: (id: number | null) => Promise<void>;
+    fetchApplication: () => Promise<void>;
     updateApplication: (payload: Partial<ApplicationInput>) => Promise<boolean>;
     updateApplicantDetails: (payload: ApplicantInput) => Promise<boolean>;
     setLoading: (isLoading: boolean) => void;
@@ -73,18 +73,17 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
         coreSubjectsOptions: [], isLoadingCoreSubjects: false
     }),
 
-    fetchApplication: async (id: number | null) => {
+    fetchApplication: async () => {
         set({ isLoading: true, error: null });
         try {
-            let response = null;
-            if (!id) response = await axiosInstance.get<ApplicationOutput>('/api/v1.0/applications');
-            else response = await axiosInstance.get<ApplicationOutput>(`/api/v1.0/applications?id=${id}`);
+            const response = await axiosInstance.get<ApplicationOutput>('/api/v1.0/applications');
             const appData = response.data;
             set({
                 application: appData,
                 applicationId: appData?.id ?? null,
                 isLoading: false,
             });
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             set({ isLoading: false, error: "Failed to load application data.", application: null, applicationId: null });
         }
@@ -99,7 +98,7 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             await axiosInstance.put(`/api/v1.0/applications/${currentId}`, payload);
-            await get().fetchApplication(get().applicationId ?? null);
+            await get().fetchApplication();
             set({ isLoading: false });
             return true;
         } catch (error) {
@@ -119,7 +118,7 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
         set({ isLoading: true, error: null });
         try {
             await axiosInstance.put(`/api/v1.0/applicants/${applicantId}`, payload);
-            await get().fetchApplication(applicantId ?? null);
+            await get().fetchApplication();
             set({ isLoading: false });
             return true;
         } catch (error) {

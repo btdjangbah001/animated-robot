@@ -13,7 +13,7 @@ import {Checkbox} from "@/components/ui/checkbox";
 import {Separator} from "@/components/ui/separator";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import useApplicationStore from "@/store/applicationStore";
-import {ApplicantInput, ApplicationInput} from "@/types/application";
+import {ApplicantInput} from "@/types/application";
 import axiosInstance from "@/lib/axios";
 import {DistrictOutput, RegionOutput} from "@/types/applicant";
 import {countries, nationalities} from "@/lib/consts";
@@ -106,8 +106,9 @@ export function PersonalDetailsForm({
   const application = useApplicationStore((state) => state.application);
   const applicationId = useApplicationStore((state) => state.applicationId);
   const updateApplicantDetails = useApplicationStore(
-    (state) => state.updateApplication,
+    (state) => state.updateApplicantDetails,
   );
+  const updateApplication = useApplicationStore(state => state.updateApplication)
   const isLoading = useApplicationStore((state) => state.isLoading);
   const error = useApplicationStore((state) => state.error);
   const setError = useApplicationStore((state) => state.setError);
@@ -121,6 +122,7 @@ export function PersonalDetailsForm({
         { params: { size: 50 } },
       );
       setAllRegions(response.data?.content || []);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error("Failed to fetch regions")
     } finally {
@@ -151,6 +153,7 @@ export function PersonalDetailsForm({
           { params: { size: 261 } },
         );
         setOptions(response.data?.content || []);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         toast.error(`Failed to fetch ${type} districts`);
       } finally {
@@ -375,7 +378,7 @@ export function PersonalDetailsForm({
       lastName: formState.lastName || "",
       phoneNumber: formState.phone || "",
       email: formState.email || "",
-      gender: formState.gender || "",
+      gender: formState.gender === "Male" ? "MALE" : "FEMALE",
       dateOfBirth: formState.dob ? new Date(formState.dob).getTime() : 0,
       placeOfBirth: formState.birthPlace || "",
       country: formState.country || "",
@@ -399,12 +402,12 @@ export function PersonalDetailsForm({
       },
     };
 
-    const payload: Partial<ApplicationInput> = {
-      applicant: applicantPayload,
-      registrationStage: "DRAFT",
-    };
-
-    const success = await updateApplicantDetails(payload);
+    const succ = await updateApplicantDetails(applicantPayload);
+    if (!succ){
+      toast.error("Could not update applicant details")
+      return;
+    }
+    const success = await updateApplication({registrationStage: "DRAFT",});
     if (success) {
       setProfilePhoto(null);
       onNext();
@@ -430,6 +433,7 @@ export function PersonalDetailsForm({
               <Input
                 id="firstName"
                 name="firstName"
+                className="focus:ring-green-500"
                 value={formState.firstName}
                 onChange={handleInputChange}
                 required
@@ -441,6 +445,7 @@ export function PersonalDetailsForm({
               <Input
                 id="middleName"
                 name="middleName"
+                className="focus:ring-green-500"
                 value={formState.middleName}
                 onChange={handleInputChange}
                 disabled={isLoading}
@@ -453,6 +458,7 @@ export function PersonalDetailsForm({
               <Input
                 id="lastName"
                 name="lastName"
+                className="focus:ring-green-500"
                 value={formState.lastName}
                 onChange={handleInputChange}
                 required
@@ -470,7 +476,7 @@ export function PersonalDetailsForm({
                 required
                 disabled={isLoading}
               >
-                <SelectTrigger id="gender" className="w-full">
+                <SelectTrigger id="gender" className="w-full focus:ring-green-500">
                   <SelectValue placeholder="Select Gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -493,7 +499,7 @@ export function PersonalDetailsForm({
                 value={formState.dob}
                 onChange={handleInputChange}
                 required
-                className="block w-full"
+                className="block w-full focus:ring-green-500"
                 disabled={isLoading}
               />
             </div>
@@ -504,6 +510,7 @@ export function PersonalDetailsForm({
               <Input
                 id="birthPlace"
                 name="birthPlace"
+                className="focus:ring-green-500"
                 value={formState.birthPlace}
                 onChange={handleInputChange}
                 required
@@ -523,7 +530,7 @@ export function PersonalDetailsForm({
                   required
                   disabled={isLoading}
               >
-                <SelectTrigger id="country" className="w-full">
+                <SelectTrigger id="country" className="w-full focus:ring-green-500">
                   <SelectValue placeholder="Select Country" />
                 </SelectTrigger>
                 <SelectContent>
@@ -548,7 +555,7 @@ export function PersonalDetailsForm({
                 required
                 disabled={isLoading}
               >
-                <SelectTrigger id="nationality" className="w-full">
+                <SelectTrigger id="nationality" className="w-full focus:ring-green-500">
                   <SelectValue placeholder="Select Nationality" />
                 </SelectTrigger>
                 <SelectContent>
@@ -567,6 +574,7 @@ export function PersonalDetailsForm({
               <Input
                 id="languages"
                 name="languagesSpoken"
+                className="focus:ring-green-500"
                 value={formState.languagesSpoken}
                 onChange={handleInputChange}
                 required
@@ -704,6 +712,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="address"
                   name="address"
+                  className="focus:ring-green-500"
                   value={formState.address}
                   onChange={handleInputChange}
                   required
@@ -717,6 +726,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="city"
                   name="city"
+                  className="focus:ring-green-500"
                   value={formState.city}
                   onChange={handleInputChange}
                   required
@@ -736,7 +746,7 @@ export function PersonalDetailsForm({
                   required
                   disabled={isLoading || loadingRegions}
                 >
-                  <SelectTrigger id="contactRegionId" className="w-full">
+                  <SelectTrigger id="contactRegionId" className="w-full focus:ring-green-500">
                     <SelectValue placeholder="Select Region" />
                   </SelectTrigger>
                   <SelectContent>
@@ -771,7 +781,7 @@ export function PersonalDetailsForm({
                     !formState.contactRegionId
                   }
                 >
-                  <SelectTrigger id="contactDistrictId" className="w-full">
+                  <SelectTrigger id="contactDistrictId" className="w-full focus:ring-green-500">
                     <SelectValue
                       placeholder={
                         !formState.contactRegionId
@@ -800,6 +810,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="digitalAddress"
                   name="digitalAddress"
+                  className="focus:ring-green-500"
                   value={formState.digitalAddress}
                   onChange={handleInputChange}
                   placeholder="e.g. GA-123-4567"
@@ -814,6 +825,7 @@ export function PersonalDetailsForm({
                   id="phone"
                   name="phone"
                   type="tel"
+                  className="focus:ring-green-500"
                   value={formState.phone}
                   onChange={handleInputChange}
                   required
@@ -827,6 +839,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="email"
                   name="email"
+                  className="focus:ring-green-500"
                   type="email"
                   value={formState.email}
                   onChange={handleInputChange}
@@ -851,6 +864,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="parentName"
                   name="parentName"
+                  className="focus:ring-green-500"
                   value={formState.parentName}
                   onChange={handleInputChange}
                   required
@@ -865,6 +879,7 @@ export function PersonalDetailsForm({
                   id="parentContact"
                   name="parentContact"
                   type="tel"
+                  className="focus:ring-green-500"
                   value={formState.parentContact}
                   onChange={handleInputChange}
                   required

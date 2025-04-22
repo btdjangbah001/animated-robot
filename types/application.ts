@@ -52,8 +52,8 @@ export interface ApplicationInput {
     | "PROGRAM_DETAILS"
     | "ACADEMIC_DETAILS"
     | "PERSONAL_DETAILS"
-    | "COMPLETED"
     | "DRAFT"
+    | "SUBMITTED"
   submissionDate?: number | null; // Timestamp
   applicant?: ApplicantInput | null;
   electiveResults?: ElectiveResultInput[] | null;

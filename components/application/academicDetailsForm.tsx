@@ -64,7 +64,6 @@ export function AcademicDetailsForm({
     (state) => state.updateApplication,
   );
   const isLoading = useApplicationStore((state) => state.isLoading);
-  const error = useApplicationStore((state) => state.error);
   const setError = useApplicationStore((state) => state.setError);
   const waecCourses = useApplicationStore((state) => state.waecCourses);
   const isLoadingWaecCourses = useApplicationStore(
@@ -82,7 +81,6 @@ export function AcademicDetailsForm({
   const fetchCoreSubjects = useApplicationStore(
     (state) => state.fetchCoreSubjects,
   );
-  const dropdownError = useApplicationStore((state) => state.dropdownError);
 
   useEffect(() => {
     if (waecCourses.length === 0) fetchWaecCourses().then(() => {});
@@ -202,6 +200,7 @@ export function AcademicDetailsForm({
             : s,
         ),
       );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       toast.error(`Failed to fetch subjects.`)
       setElectiveSubjects((prev) =>
@@ -310,13 +309,6 @@ export function AcademicDetailsForm({
     }
   };
 
-  useEffect(() => {
-    const displayError = error || dropdownError;
-    if (displayError){
-      toast.error(displayError)
-    }
-  }, [error, dropdownError]);
-
   const handleBack = () => {
     onBack();
   };
@@ -341,7 +333,7 @@ export function AcademicDetailsForm({
               required
               disabled={isLoading}
             >
-              <SelectTrigger id="application-type" className="w-full">
+              <SelectTrigger id="application-type" className="w-full focus:ring-green-500">
                 <SelectValue placeholder="Select application type" />
               </SelectTrigger>
               <SelectContent>
@@ -403,7 +395,7 @@ export function AcademicDetailsForm({
                       >
                         <SelectTrigger
                           id={`waecCourse-${subject.id}`}
-                          className="w-full"
+                          className="w-full focus:ring-green-500"
                         >
                           <SelectValue placeholder="Select Waec Course" />
                         </SelectTrigger>
@@ -450,7 +442,7 @@ export function AcademicDetailsForm({
                       >
                         <SelectTrigger
                           id={`subject-${subject.id}`}
-                          className="w-full"
+                          className="w-full focus:ring-green-500"
                         >
                           <SelectValue
                             placeholder={
@@ -499,7 +491,7 @@ export function AcademicDetailsForm({
                       >
                         <SelectTrigger
                           id={`grade-${subject.id}`}
-                          className="w-full"
+                          className="w-full focus:ring-green-500"
                         >
                           <SelectValue placeholder="Grade" />
                         </SelectTrigger>
@@ -533,7 +525,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading}
-                        className="w-full"
+                        className="w-full focus:ring-green-500"
                       />
                     </div>
                     {/* Exam Date - Spans 2 cols on small, takes 1.5fr space on lg */}
@@ -555,7 +547,7 @@ export function AcademicDetailsForm({
                         >
                           <SelectTrigger
                             aria-label="Exam Year"
-                            className="w-full"
+                            className="w-full focus:ring-green-500"
                           >
                             <SelectValue placeholder="Year" />
                           </SelectTrigger>
@@ -580,7 +572,7 @@ export function AcademicDetailsForm({
                         >
                           <SelectTrigger
                             aria-label="Exam Month"
-                            className="w-full"
+                            className="w-full focus:ring-green-500"
                           >
                             <SelectValue placeholder="Month" />
                           </SelectTrigger>
@@ -692,7 +684,7 @@ export function AcademicDetailsForm({
                       >
                         <SelectTrigger
                           id={`core-grade-${subject.id}`}
-                          className="w-full"
+                          className="w-full focus:ring-green-500"
                         >
                           <SelectValue placeholder="Grade" />
                         </SelectTrigger>
@@ -726,7 +718,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading}
-                        className="w-full"
+                        className="w-full focus:ring-green-500"
                       />{" "}
                     </div>
                     <div className="space-y-1.5 col-span-2 lg:col-span-1">
@@ -749,7 +741,7 @@ export function AcademicDetailsForm({
                         >
                           <SelectTrigger
                             aria-label="Core Exam Year"
-                            className="w-full"
+                            className="w-full focus:ring-green-500"
                           >
                             <SelectValue placeholder="Year" />
                           </SelectTrigger>
@@ -774,7 +766,7 @@ export function AcademicDetailsForm({
                         >
                           <SelectTrigger
                             aria-label="Core Exam Month"
-                            className="w-full"
+                            className="w-full focus:ring-green-500"
                           >
                             <SelectValue placeholder="Month" />
                           </SelectTrigger>

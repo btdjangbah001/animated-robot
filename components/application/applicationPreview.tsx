@@ -11,6 +11,7 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import useApplicationStore from "@/store/applicationStore";
 import axiosInstance from "@/lib/axios";
 import {CoreResultOutput, ElectiveResultOutput} from "@/types/applicant";
+import {toast} from "react-toastify";
 
 interface ApplicationPreviewProps {
   onBack: () => void;
@@ -52,7 +53,7 @@ export function ApplicationPreview({
 
   React.useEffect(() => {
     if (!application && !isLoading && !error) {
-      fetchApplication(applicationId ?? null).then(()=>{});
+      fetchApplication().then(()=>{});
     }
   }, [application, isLoading, error, fetchApplication, applicationId]);
 
@@ -67,14 +68,15 @@ export function ApplicationPreview({
             `/api/v1.0/files/download/${currentPhotoId}`,
           );
           setPhotoUrl(response.data?.signedUrl || null);
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
-          console.error("Failed to fetch photo preview URL:", err);
+          toast.error("Failed to fetch photo for preview")
           setPhotoUrl(null);
         } finally {
           setIsLoadingPhotoUrl(false);
         }
       };
-      fetchUrl();
+      fetchUrl().then(()=>{});
     } else if (!currentPhotoId) {
       setPhotoUrl(null);
     }
@@ -125,14 +127,6 @@ export function ApplicationPreview({
       </div>
     );
   }
-  if (error) {
-    return (
-      <div className="text-red-600 bg-red-50 p-4 rounded-md">
-        {" "}
-        Error loading application data: {error}{" "}
-      </div>
-    );
-  }
   if (!application) {
     return (
       <div className="text-center text-gray-500 py-10">
@@ -167,7 +161,7 @@ export function ApplicationPreview({
               />{" "}
               <DetailItem
                 label="Application PIN"
-                value={application.applicationPin}
+                value={application.applicant?.pin}
               />{" "}
             </dl>{" "}
           </AccordionContent>
@@ -270,11 +264,9 @@ export function ApplicationPreview({
                   {allSubjects.map((s, index) => (
                     <TableRow key={s.id || index}>
                       <TableCell>
-                        {s.type === "Elective"
-                          ? (s as ElectiveResultOutput).course?.name
-                          : s.type}
+                        {s.type}
                       </TableCell>
-                      <TableCell>{s.subject?.name}</TableCell>
+                      <TableCell>{s.subject?.name ?? "-"}</TableCell>
                       <TableCell className="text-center">{s.grade}</TableCell>
                       <TableCell>{s.indexNumber}</TableCell>
                       <TableCell>{`${s.month || ""}, ${s.year || ""}`}</TableCell>
@@ -343,14 +335,6 @@ export function ApplicationPreview({
               <DetailItem
                 label="Nationality"
                 value={application.applicant?.nationality}
-              />
-              <DetailItem
-                label="Region of Birth"
-                value={application.applicant?.district?.region?.name}
-              />
-              <DetailItem
-                label="District of Birth"
-                value={application.applicant?.district?.name}
               />
               <DetailItem
                 label="Languages Spoken"

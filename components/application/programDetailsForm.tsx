@@ -6,7 +6,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import useApplicationStore from "@/store/applicationStore";
-import {toast} from "react-toastify";
+import {ApplicationInput} from "@/types/application";
 
 interface ProgramDetailsFormProps {
   onNext: () => void;
@@ -47,7 +47,6 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
   const isLoadingPrograms = useApplicationStore(
     (state) => state.isLoadingPrograms,
   );
-  const dropdownError = useApplicationStore((state) => state.dropdownError);
   const fetchApplication = useApplicationStore(
     (state) => state.fetchApplication,
   );
@@ -64,7 +63,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
   const clearPrograms = useApplicationStore((state) => state.clearPrograms);
 
   useEffect(() => {
-    if (!application && !isLoading && !error) fetchApplication(applicationId ?? null).then(() => {});
+    if (!application && !isLoading && !error) fetchApplication().then(() => {});
     if (programTypes.length === 0) fetchProgramTypes().then(() => {});
   }, [
     fetchProgramTypes,
@@ -75,12 +74,6 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
     fetchApplication,
   ]);
 
-  useEffect(() => {
-    const combinedError = error || dropdownError;
-    if (combinedError) {
-      toast.error(combinedError);
-    }
-  }, [error, dropdownError]);
 
   useEffect(() => {
     if (application) {
@@ -168,7 +161,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
       return;
     }
 
-    const payload = {
+    const payload: Partial<ApplicationInput> = {
       institutionId: Number(selectedInstitutionId),
       programId: Number(selectedProgramId),
       registrationStage: "ACADEMIC_DETAILS",

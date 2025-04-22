@@ -1,4 +1,4 @@
-import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, {AxiosError, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
 import Cookie from "js-cookie";
 
 const baseURL: string = process.env.NEXT_PUBLIC_API_URL ?? "";
@@ -65,10 +65,9 @@ axiosInstance.interceptors.response.use(
                 // Since no refresh endpoint, treat as failure:
                 clearAuthTokens();
                 if (typeof window !== 'undefined') {
-                    // Consider state management trigger instead of hard redirect
-                    // window.location.href = '/login';
+                    window.location.href = '/auth/login';
                 }
-                return Promise.reject(error); // Reject original error after clearing tokens
+                return Promise.reject(error);
 
             } else {
                 clearAuthTokens();
