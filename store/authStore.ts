@@ -1,8 +1,8 @@
-import { create } from 'zustand';
+import {create} from 'zustand';
 import Cookies from 'js-cookie';
-import axiosInstance, { setAuthTokens, clearAuthTokens } from '@/lib/axios';
-import { LoginResponseDto } from '@/types/auth';
-import { ApplicantOutput } from "@/types/applicant";
+import axiosInstance, {clearAuthTokens, setAuthTokens} from '@/lib/axios';
+import {LoginResponseDto} from '@/types/auth';
+import {ApplicantOutput} from "@/types/applicant";
 
 interface AuthState {
     user: ApplicantOutput | null;
@@ -28,7 +28,7 @@ const useAuthStore = create<AuthStore>((set) => ({
     isLoading: false,
     error: null,
 
-    setUser: (user) => set({ user: user ? { ...user } : null, isAuthenticated: !!user }), // Ensure new object
+    setUser: (user) => set({ user: user ? { ...user } : null, isAuthenticated: !!user }),
     setLoading: (isLoading) => set({ isLoading }),
     setError: (error) => set({ error }),
 

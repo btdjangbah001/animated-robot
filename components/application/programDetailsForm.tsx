@@ -1,18 +1,12 @@
 "use client";
-import React, { FormEvent, useEffect, useState } from "react";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import React, {FormEvent, useEffect, useState} from "react";
+import {ArrowRight, Loader2} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Label} from "@/components/ui/label";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import useApplicationStore from "@/store/applicationStore";
+import {toast} from "react-toastify";
 
 interface ProgramDetailsFormProps {
   onNext: () => void;
@@ -70,7 +64,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
   const clearPrograms = useApplicationStore((state) => state.clearPrograms);
 
   useEffect(() => {
-    if (!application && !isLoading && !error) fetchApplication().then(() => {});
+    if (!application && !isLoading && !error) fetchApplication(applicationId ?? null).then(() => {});
     if (programTypes.length === 0) fetchProgramTypes().then(() => {});
   }, [
     fetchProgramTypes,
@@ -80,6 +74,13 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
     error,
     fetchApplication,
   ]);
+
+  useEffect(() => {
+    const combinedError = error || dropdownError;
+    if (combinedError) {
+      toast.error(combinedError);
+    }
+  }, [error, dropdownError]);
 
   useEffect(() => {
     if (application) {
@@ -184,8 +185,6 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
     }
   };
 
-  const displayError = error || dropdownError;
-
   return (
     <Card className="w-full shadow-sm">
       <CardHeader>
@@ -197,13 +196,6 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit}>
-          {displayError && (
-            <Alert variant="destructive" className="mb-4">
-              {" "}
-              <AlertTitle>Error</AlertTitle>{" "}
-              <AlertDescription>{displayError}</AlertDescription>{" "}
-            </Alert>
-          )}
           <div className="grid gap-6">
             <div className="space-y-2">
               <Label htmlFor="program-type">

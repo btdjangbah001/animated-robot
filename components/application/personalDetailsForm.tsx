@@ -1,43 +1,23 @@
 "use client";
 
-import React, {
-  ChangeEvent,
-  FormEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Loader2,
-  Paperclip,
-  User as UserIcon,
-  X,
-} from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import React, {ChangeEvent, FormEvent, useCallback, useEffect, useRef, useState,} from "react";
+import {ArrowLeft, ArrowRight, Loader2, Paperclip, User as UserIcon, X,} from "lucide-react";
+import {format} from "date-fns";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
+import {Checkbox} from "@/components/ui/checkbox";
+import {Separator} from "@/components/ui/separator";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import useApplicationStore from "@/store/applicationStore";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ApplicantInput, ApplicationInput } from "@/types/application";
+import {ApplicantInput, ApplicationInput} from "@/types/application";
 import axiosInstance from "@/lib/axios";
-import { DistrictOutput, RegionOutput } from "@/types/applicant";
-import { nationalities } from "@/lib/consts";
+import {DistrictOutput, RegionOutput} from "@/types/applicant";
+import {countries, nationalities} from "@/lib/consts";
+import {toast} from "react-toastify";
 
 interface PersonalDetailsFormProps {
   onNext: () => void;
@@ -53,8 +33,6 @@ interface PersonalDetailsState {
   birthPlace: string;
   country: string;
   nationality: string;
-  birthRegionId: string;
-  birthDistrictId: string;
   languagesSpoken: string;
   selectedConditions: string[];
   address: string;
@@ -68,8 +46,9 @@ interface PersonalDetailsState {
   parentContact: string;
 }
 
-const genderOptions = ["MALE", "FEMALE"];
+const genderOptions = ["Male", "Female"];
 const nationalityOptions = nationalities;
+const countryOptions = countries;
 const medicalConditions = [
   { id: "none", label: "None" },
   { id: "deaf", label: "DEAF" },
@@ -91,8 +70,6 @@ const initialFormState: PersonalDetailsState = {
   birthPlace: "",
   country: "",
   nationality: "",
-  birthRegionId: "",
-  birthDistrictId: "",
   languagesSpoken: "",
   selectedConditions: ["none"],
   address: "",
@@ -120,16 +97,11 @@ export function PersonalDetailsForm({
     useState<PersonalDetailsState | null>(null);
 
   const [allRegions, setAllRegions] = useState<RegionOutput[]>([]);
-  const [birthDistrictOptions, setBirthDistrictOptions] = useState<
-    DistrictOutput[]
-  >([]);
   const [contactDistrictOptions, setContactDistrictOptions] = useState<
     DistrictOutput[]
   >([]);
   const [loadingRegions, setLoadingRegions] = useState(false);
-  const [loadingBirthDistricts, setLoadingBirthDistricts] = useState(false);
   const [loadingContactDistricts, setLoadingContactDistricts] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
 
   const application = useApplicationStore((state) => state.application);
   const applicationId = useApplicationStore((state) => state.applicationId);
@@ -142,7 +114,6 @@ export function PersonalDetailsForm({
 
   const fetchRegions = useCallback(async () => {
     setLoadingRegions(true);
-    setLocalError(null);
     try {
       const response = await axiosInstance.post(
         "/api/v1.0/regions/search",
@@ -151,38 +122,37 @@ export function PersonalDetailsForm({
       );
       setAllRegions(response.data?.content || []);
     } catch (err) {
-      console.error("Failed to fetch regions:", err);
-      setLocalError("Failed to load regions.");
+      toast.error("Failed to fetch regions")
     } finally {
       setLoadingRegions(false);
     }
   }, []);
 
+  useEffect(() => {
+    if (error){
+      toast.error(error);
+    }
+  }, [error]);
+
   const fetchDistricts = useCallback(
-    async (regionId: string, type: "birth" | "contact") => {
+    async (regionId: string, type: "contact") => {
       if (!regionId) return;
-      const setLoading =
-        type === "birth"
-          ? setLoadingBirthDistricts
-          : setLoadingContactDistricts;
-      const setOptions =
-        type === "birth" ? setBirthDistrictOptions : setContactDistrictOptions;
+      const setLoading = setLoadingContactDistricts;
+      const setOptions = setContactDistrictOptions;
       setLoading(true);
       setOptions([]);
-      setLocalError(null);
       try {
         const payload = {
-          where: { field: "regionId", operator: "eq", value: Number(regionId) },
+          where: [{ leftHand: {value: "regionId"}, matchMode: "EQUAL", rightHand: {value: Number(regionId)}, operator: "AND" }],
         };
         const response = await axiosInstance.post(
           "/api/v1.0/districts/search",
           payload,
-          { params: { size: 200 } },
+          { params: { size: 261 } },
         );
         setOptions(response.data?.content || []);
       } catch (err) {
-        console.error(`Failed to fetch ${type} districts:`, err);
-        setLocalError(`Failed to load ${type} districts.`);
+        toast.error(`Failed to fetch ${type} districts`);
       } finally {
         setLoading(false);
       }
@@ -191,18 +161,12 @@ export function PersonalDetailsForm({
   );
 
   useEffect(() => {
-    fetchRegions();
+    fetchRegions().then(()=>{});
   }, [fetchRegions]);
 
   useEffect(() => {
-    if (formState.birthRegionId)
-      fetchDistricts(formState.birthRegionId, "birth");
-    else setBirthDistrictOptions([]);
-  }, [formState.birthRegionId, fetchDistricts]);
-
-  useEffect(() => {
     if (formState.contactRegionId)
-      fetchDistricts(formState.contactRegionId, "contact");
+      fetchDistricts(formState.contactRegionId, "contact").then(()=>{});
     else setContactDistrictOptions([]);
   }, [formState.contactRegionId, fetchDistricts]);
 
@@ -232,8 +196,6 @@ export function PersonalDetailsForm({
             .map((s) => s.trim())
             .filter((s) => s)
         : [];
-      const birthRegionIdStr = app.district?.regionId?.toString() ?? "";
-      const birthDistrictIdStr = app.districtId?.toString() ?? "";
       const contactRegionIdStr = contact?.district?.regionId?.toString() ?? "";
       const contactDistrictIdStr = contact?.districtId?.toString() ?? "";
 
@@ -248,8 +210,6 @@ export function PersonalDetailsForm({
         birthPlace: app.placeOfBirth || "",
         country: app.country || "",
         nationality: app.nationality || "",
-        birthRegionId: birthRegionIdStr,
-        birthDistrictId: birthDistrictIdStr,
         languagesSpoken: app.languagesSpoken || "",
         selectedConditions: conditions.length > 0 ? conditions : ["none"],
         address: contact?.address || "",
@@ -268,7 +228,7 @@ export function PersonalDetailsForm({
 
       setProfilePhoto(null);
       if (app.profilePhotoId) {
-        fetchPhotoPreviewUrl(app.profilePhotoId);
+        fetchPhotoPreviewUrl(app.profilePhotoId).then(()=>{});
       } else {
         setPhotoPreview(null);
       }
@@ -290,8 +250,6 @@ export function PersonalDetailsForm({
     value: string,
   ) => {
     setFormState((prev) => ({ ...prev, [name]: value }));
-    if (name === "birthRegionId")
-      setFormState((prev) => ({ ...prev, birthDistrictId: "" }));
     if (name === "contactRegionId")
       setFormState((prev) => ({ ...prev, contactDistrictId: "" }));
   };
@@ -323,17 +281,13 @@ export function PersonalDetailsForm({
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 200 * 1024) {
-        alert("File is too large! Maximum size is 200KB.");
-        event.target.value = "";
-        return;
-      }
+      console.log("Choosing photo")
       setProfilePhoto(file);
       setPhotoPreview(URL.createObjectURL(file));
     } else {
       setProfilePhoto(null);
       if (application?.applicant?.profilePhotoId) {
-        fetchPhotoPreviewUrl(application.applicant.profilePhotoId);
+        fetchPhotoPreviewUrl(application.applicant.profilePhotoId).then(()=>{});
       } else {
         setPhotoPreview(null);
       }
@@ -347,7 +301,7 @@ export function PersonalDetailsForm({
   const clearFile = () => {
     setProfilePhoto(null);
     if (application?.applicant?.profilePhotoId) {
-      fetchPhotoPreviewUrl(application.applicant.profilePhotoId);
+      fetchPhotoPreviewUrl(application.applicant.profilePhotoId).then(()=>{});;
     } else {
       setPhotoPreview(null);
     }
@@ -363,9 +317,8 @@ export function PersonalDetailsForm({
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
-    setLocalError(null);
     if (!applicationId || !application?.applicant?.id) {
-      setError("Application/Applicant ID not found.");
+      toast.error("Application/Applicant ID not found.");
       return;
     }
 
@@ -417,33 +370,30 @@ export function PersonalDetailsForm({
     }
 
     const applicantPayload: ApplicantInput = {
-      firstName: formState.firstName || null,
-      middleName: formState.middleName || null,
-      lastName: formState.lastName || null,
-      phoneNumber: formState.phone || null,
-      email: formState.email || null,
-      gender: formState.gender || null,
-      dateOfBirth: formState.dob ? new Date(formState.dob).getTime() : null,
-      placeOfBirth: formState.birthPlace || null,
-      country: formState.country || null,
-      nationality: formState.nationality || null,
-      districtId: formState.birthDistrictId
-        ? Number(formState.birthDistrictId)
-        : null,
-      languagesSpoken: formState.languagesSpoken || null,
+      firstName: formState.firstName || "",
+      middleName: formState.middleName || "",
+      lastName: formState.lastName || "",
+      phoneNumber: formState.phone || "",
+      email: formState.email || "",
+      gender: formState.gender || "",
+      dateOfBirth: formState.dob ? new Date(formState.dob).getTime() : 0,
+      placeOfBirth: formState.birthPlace || "",
+      country: formState.country || "",
+      nationality: formState.nationality || "",
+      languagesSpoken: formState.languagesSpoken || "",
       medicalConditions: formState.selectedConditions.includes("none")
-        ? null
+        ? ""
         : formState.selectedConditions.join(", "),
       profilePhotoId: profilePhotoIdToSubmit,
       contactInformation: {
-        address: formState.address || null,
-        city: formState.city || null,
+        address: formState.address || "",
+        city: formState.city || "",
         districtId: formState.contactDistrictId
           ? Number(formState.contactDistrictId)
           : null,
-        digitalAddress: formState.digitalAddress || null,
-        contactPersonName: formState.parentName || null,
-        contactPersonPhoneNUmber: formState.parentContact || null,
+        digitalAddress: formState.digitalAddress || "",
+        contactPersonName: formState.parentName || "",
+        contactPersonPhoneNUmber: formState.parentContact || "",
         phoneNumber: formState.phone,
         email: formState.email,
       },
@@ -451,18 +401,15 @@ export function PersonalDetailsForm({
 
     const payload: Partial<ApplicationInput> = {
       applicant: applicantPayload,
-      registrationStage: "COMPLETED",
+      registrationStage: "DRAFT",
     };
 
     const success = await updateApplicantDetails(payload);
     if (success) {
-      setInitialValues(JSON.parse(JSON.stringify(formState)));
       setProfilePhoto(null);
       onNext();
     }
   };
-
-  const displayError = error || localError;
 
   return (
     <Card className="w-full shadow-sm">
@@ -475,15 +422,6 @@ export function PersonalDetailsForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-8">
-          {displayError && (
-            <Alert variant="destructive" className="mb-4">
-              {" "}
-              <AlertTitle>Error</AlertTitle>{" "}
-              <AlertDescription>{displayError}</AlertDescription>{" "}
-            </Alert>
-          )}
-
-          {/* Section 1: Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="firstName">
@@ -574,16 +512,28 @@ export function PersonalDetailsForm({
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="country">
-                Country of Birth <span className="text-red-500">*</span>
+                Country <span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="country"
-                name="country"
-                value={formState.country}
-                onChange={handleInputChange}
-                required
-                disabled={isLoading}
-              />
+              <Select
+                  name="country"
+                  value={formState.country}
+                  onValueChange={(value) =>
+                      handleSelectChange("country", value)
+                  }
+                  required
+                  disabled={isLoading}
+              >
+                <SelectTrigger id="country" className="w-full">
+                  <SelectValue placeholder="Select Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countryOptions.map((o) => (
+                      <SelectItem key={o} value={o}>
+                        {o}
+                      </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="nationality">
@@ -607,76 +557,6 @@ export function PersonalDetailsForm({
                       {o}
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="birthRegionId">
-                Region of Birth <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                name="birthRegionId"
-                value={formState.birthRegionId}
-                onValueChange={(value) =>
-                  handleSelectChange("birthRegionId", value)
-                }
-                required
-                disabled={isLoading || loadingRegions}
-              >
-                <SelectTrigger id="birthRegionId" className="w-full">
-                  <SelectValue placeholder="Select Region" />
-                </SelectTrigger>
-                <SelectContent>
-                  {loadingRegions ? (
-                    <SelectItem value="load" disabled>
-                      Loading...
-                    </SelectItem>
-                  ) : (
-                    allRegions.map((o) => (
-                      <SelectItem key={o.id} value={o.id.toString()}>
-                        {o.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="birthDistrictId">
-                District of Birth <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                name="birthDistrictId"
-                value={formState.birthDistrictId}
-                onValueChange={(value) =>
-                  handleSelectChange("birthDistrictId", value)
-                }
-                required
-                disabled={
-                  isLoading || loadingBirthDistricts || !formState.birthRegionId
-                }
-              >
-                <SelectTrigger id="birthDistrictId" className="w-full">
-                  <SelectValue
-                    placeholder={
-                      !formState.birthRegionId
-                        ? "Select region first"
-                        : "Select District"
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {loadingBirthDistricts ? (
-                    <SelectItem value="load" disabled>
-                      Loading...
-                    </SelectItem>
-                  ) : (
-                    birthDistrictOptions.map((o) => (
-                      <SelectItem key={o.id} value={o.id.toString()}>
-                        {o.name}
-                      </SelectItem>
-                    ))
-                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -742,9 +622,6 @@ export function PersonalDetailsForm({
             <div className="space-y-3">
               <Label className="font-medium text-gray-700">
                 Profile Photo <span className="text-red-500">*</span>{" "}
-                <span className="text-gray-500 text-sm font-normal">
-                  [Max size: 200KB]
-                </span>
               </Label>
               <Input
                 id="profilePhotoInput"

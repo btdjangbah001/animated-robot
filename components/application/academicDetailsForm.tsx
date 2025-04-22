@@ -1,39 +1,17 @@
 "use client";
-import { FormEvent, useEffect, useState } from "react";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Loader2,
-  PlusCircle,
-  Trash2,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
+import {FormEvent, useEffect, useState} from "react";
+import {ArrowLeft, ArrowRight, Loader2, PlusCircle, Trash2,} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
+import {Separator} from "@/components/ui/separator";
 import axiosInstance from "@/lib/axios";
 import useApplicationStore from "@/store/applicationStore";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  ApplicationInput,
-  CoreResultInput,
-  ElectiveResultInput,
-} from "@/types/application";
-import { SubjectOutput } from "@/types/applicant";
+import {ApplicationInput, CoreResultInput, ElectiveResultInput,} from "@/types/application";
+import {SubjectOutput} from "@/types/applicant";
+import {toast} from "react-toastify";
 
 interface ElectiveSubjectLocal {
   id: string;
@@ -62,7 +40,8 @@ interface AcademicDetailsFormProps {
   onBack: () => void;
 }
 
-const gradeOptions = ["A1", "B2", "B3", "C4", "C5", "C6", "D7", "D8"];
+const wassceGradeOptions = ["A1", "B2", "B3", "C4", "C5", "C6", "D7", "D8"];
+const ssceGradeOptions = ["A","B","C","D","E","F"];
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: 20 }, (_, i) =>
   (currentYear - i).toString(),
@@ -78,7 +57,6 @@ export function AcademicDetailsForm({
     ElectiveSubjectLocal[]
   >([]);
   const [coreSubjects, setCoreSubjects] = useState<CoreSubjectLocal[]>([]);
-  const [localError, setLocalError] = useState<string | null>(null);
 
   const application = useApplicationStore((state) => state.application);
   const applicationId = useApplicationStore((state) => state.applicationId);
@@ -206,7 +184,6 @@ export function AcademicDetailsForm({
       ),
     );
     if (!courseId) return;
-    setLocalError(null);
     try {
       const response = await axiosInstance.get(
         `/api/v1.0/subjects/electives-by-course/${courseId}`,
@@ -226,8 +203,7 @@ export function AcademicDetailsForm({
         ),
       );
     } catch (err) {
-      console.error(`Failed to fetch subjects for course ${courseId}:`, err);
-      setLocalError(`Failed to load subjects.`);
+      toast.error(`Failed to fetch subjects.`)
       setElectiveSubjects((prev) =>
         prev.map((s) =>
           s.id === rowId ? { ...s, loadingSubjects: false } : s,
@@ -269,7 +245,6 @@ export function AcademicDetailsForm({
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
-    setLocalError(null);
     if (!applicationId) {
       setError("Application ID not found.");
       return;
@@ -318,9 +293,7 @@ export function AcademicDetailsForm({
     );
 
     if (!electivesComplete || !coresComplete) {
-      setLocalError(
-        "Please fill required fields (Grade, Index, Year, Month) for every subject.",
-      );
+      toast.error("Please fill required fields (Grade, Index, Year, Month) for every subject.");
       return;
     }
 
@@ -337,11 +310,18 @@ export function AcademicDetailsForm({
     }
   };
 
+  useEffect(() => {
+    const displayError = error || dropdownError;
+    if (displayError){
+      toast.error(displayError)
+    }
+  }, [error, dropdownError]);
+
   const handleBack = () => {
     onBack();
   };
 
-  const displayError = error || dropdownError || localError;
+  const gradeOptionsToUse = applicationType === "WASSCE" ? wassceGradeOptions : ssceGradeOptions;
 
   return (
     <Card className="w-full shadow-sm">
@@ -351,14 +331,6 @@ export function AcademicDetailsForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-8">
-          {displayError && (
-            <Alert variant="destructive" className="mb-4">
-              {" "}
-              <AlertTitle>Error</AlertTitle>{" "}
-              <AlertDescription>{displayError}</AlertDescription>{" "}
-            </Alert>
-          )}
-
           <div className="space-y-1.5 max-w-sm">
             <Label htmlFor="application-type">
               Application Type <span className="text-red-500">*</span>
@@ -532,7 +504,7 @@ export function AcademicDetailsForm({
                           <SelectValue placeholder="Grade" />
                         </SelectTrigger>
                         <SelectContent>
-                          {gradeOptions.map((opt) => (
+                          {gradeOptionsToUse.map((opt) => (
                             <SelectItem key={opt} value={opt}>
                               {opt}
                             </SelectItem>
@@ -725,7 +697,7 @@ export function AcademicDetailsForm({
                           <SelectValue placeholder="Grade" />
                         </SelectTrigger>
                         <SelectContent>
-                          {gradeOptions.map((opt) => (
+                          {gradeOptionsToUse.map((opt) => (
                             <SelectItem key={opt} value={opt}>
                               {opt}
                             </SelectItem>

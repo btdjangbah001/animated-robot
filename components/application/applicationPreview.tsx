@@ -1,28 +1,16 @@
 "use client";
 
 import * as React from "react";
-import { ArrowLeft, Send, Edit, User as UserIcon, Loader2 } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {ArrowLeft, Edit, Loader2, Send, User as UserIcon} from "lucide-react";
+import {format} from "date-fns";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import useApplicationStore from "@/store/applicationStore";
 import axiosInstance from "@/lib/axios";
-import { CoreResultOutput, ElectiveResultOutput } from "@/types/applicant";
+import {CoreResultOutput, ElectiveResultOutput} from "@/types/applicant";
 
 interface ApplicationPreviewProps {
   onBack: () => void;
@@ -51,6 +39,7 @@ export function ApplicationPreview({
   onSubmit,
   onEdit,
 }: ApplicationPreviewProps) {
+  const applicationId = useApplicationStore((state) => state.applicationId);
   const application = useApplicationStore((state) => state.application);
   const isLoading = useApplicationStore((state) => state.isLoading);
   const error = useApplicationStore((state) => state.error);
@@ -63,9 +52,9 @@ export function ApplicationPreview({
 
   React.useEffect(() => {
     if (!application && !isLoading && !error) {
-      fetchApplication();
+      fetchApplication(applicationId ?? null).then(()=>{});
     }
-  }, [application, isLoading, error, fetchApplication]);
+  }, [application, isLoading, error, fetchApplication, applicationId]);
 
   React.useEffect(() => {
     const currentPhotoId = application?.applicant?.profilePhotoId;
