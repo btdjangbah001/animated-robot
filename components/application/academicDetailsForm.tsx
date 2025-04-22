@@ -1,11 +1,11 @@
 "use client";
 import { FormEvent, useEffect, useState } from "react";
 import {
-  PlusCircle,
-  Trash2,
   ArrowLeft,
   ArrowRight,
   Loader2,
+  PlusCircle,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,9 +29,9 @@ import axiosInstance from "@/lib/axios";
 import useApplicationStore from "@/store/applicationStore";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
-  ElectiveResultInput,
-  CoreResultInput,
   ApplicationInput,
+  CoreResultInput,
+  ElectiveResultInput,
 } from "@/types/application";
 import { SubjectOutput } from "@/types/applicant";
 
@@ -62,7 +62,7 @@ interface AcademicDetailsFormProps {
   onBack: () => void;
 }
 
-const gradeOptions = ["A1", "B2", "B3", "C4", "C5", "C6", "D7", "E8", "F9"];
+const gradeOptions = ["A1", "B2", "B3", "C4", "C5", "C6", "D7", "D8"];
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: 20 }, (_, i) =>
   (currentYear - i).toString(),
@@ -107,8 +107,8 @@ export function AcademicDetailsForm({
   const dropdownError = useApplicationStore((state) => state.dropdownError);
 
   useEffect(() => {
-    if (waecCourses.length === 0) fetchWaecCourses();
-    if (coreSubjectsOptions.length === 0) fetchCoreSubjects();
+    if (waecCourses.length === 0) fetchWaecCourses().then(() => {});
+    if (coreSubjectsOptions.length === 0) fetchCoreSubjects().then(() => {});
   }, [
     fetchWaecCourses,
     fetchCoreSubjects,
@@ -165,7 +165,9 @@ export function AcademicDetailsForm({
 
       electivesFromStore.forEach((elective) => {
         if (elective.waecCourseId) {
-          handleWaecCourseChange(elective.id, elective.waecCourseId, true);
+          handleWaecCourseChange(elective.id, elective.waecCourseId, true).then(
+            () => {},
+          );
         }
       });
     }
@@ -326,7 +328,7 @@ export function AcademicDetailsForm({
       examinationType: applicationType,
       electiveResults: mappedElectiveResults,
       coreResults: mappedCoreResults,
-      registrationStage: "ACADEMIC_DETAILS",
+      registrationStage: "PERSONAL_DETAILS",
     };
 
     const success = await updateApplication(payload);
@@ -367,7 +369,7 @@ export function AcademicDetailsForm({
               required
               disabled={isLoading}
             >
-              <SelectTrigger id="application-type">
+              <SelectTrigger id="application-type" className="w-full">
                 <SelectValue placeholder="Select application type" />
               </SelectTrigger>
               <SelectContent>
@@ -378,6 +380,7 @@ export function AcademicDetailsForm({
           </div>
           <Separator />
 
+          {/* --- Elective Subjects Section --- */}
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-1">
@@ -393,6 +396,8 @@ export function AcademicDetailsForm({
                 Input your best subjects and grades...
               </p>
             </div>
+            {/* Labels Row - Hidden below lg */}
+            {/* Adjusted lg grid definition to match input row */}
             <div className="hidden lg:grid lg:grid-cols-[1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-x-4 px-1 pb-2 border-b">
               <Label>Waec Course</Label> <Label>Subject</Label>{" "}
               <Label>Grade</Label> <Label>Index Number</Label>{" "}
@@ -407,11 +412,13 @@ export function AcademicDetailsForm({
                   key={subject.id}
                   className="border-b border-gray-200 pb-5 last:border-b-0 last:pb-0"
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-x-4 gap-y-3 items-end">
+                  {/* Grid for Inputs: 2 cols default, custom fr units on lg */}
+                  <div className="grid grid-cols-2 lg:grid-cols-[1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-4 items-stretch">
+                    {/* Waec Course - lg:col-span-1 implied by grid definition */}
                     <div className="space-y-1.5">
                       <Label
                         htmlFor={`waecCourse-${subject.id}`}
-                        className="lg:hidden"
+                        className="text-sm font-medium text-gray-600 lg:hidden"
                       >
                         Waec Course
                       </Label>
@@ -422,7 +429,10 @@ export function AcademicDetailsForm({
                         }
                         disabled={isLoadingWaecCourses || isLoading}
                       >
-                        <SelectTrigger id={`waecCourse-${subject.id}`}>
+                        <SelectTrigger
+                          id={`waecCourse-${subject.id}`}
+                          className="w-full"
+                        >
                           <SelectValue placeholder="Select Waec Course" />
                         </SelectTrigger>
                         <SelectContent>
@@ -443,10 +453,11 @@ export function AcademicDetailsForm({
                         </SelectContent>
                       </Select>
                     </div>
+                    {/* Subject - lg:col-span-1 implied */}
                     <div className="space-y-1.5">
                       <Label
                         htmlFor={`subject-${subject.id}`}
-                        className="lg:hidden"
+                        className="text-sm font-medium text-gray-600 lg:hidden"
                       >
                         Subject
                       </Label>
@@ -465,7 +476,10 @@ export function AcademicDetailsForm({
                           isLoading
                         }
                       >
-                        <SelectTrigger id={`subject-${subject.id}`}>
+                        <SelectTrigger
+                          id={`subject-${subject.id}`}
+                          className="w-full"
+                        >
                           <SelectValue
                             placeholder={
                               !subject.waecCourseId
@@ -492,10 +506,11 @@ export function AcademicDetailsForm({
                         </SelectContent>
                       </Select>
                     </div>
+                    {/* Grade - lg:col-span-1 implied */}
                     <div className="space-y-1.5">
                       <Label
                         htmlFor={`grade-${subject.id}`}
-                        className="lg:hidden"
+                        className="text-sm font-medium text-gray-600 lg:hidden"
                       >
                         Grade
                       </Label>
@@ -510,7 +525,10 @@ export function AcademicDetailsForm({
                         }
                         disabled={isLoading}
                       >
-                        <SelectTrigger id={`grade-${subject.id}`}>
+                        <SelectTrigger
+                          id={`grade-${subject.id}`}
+                          className="w-full"
+                        >
                           <SelectValue placeholder="Grade" />
                         </SelectTrigger>
                         <SelectContent>
@@ -522,10 +540,11 @@ export function AcademicDetailsForm({
                         </SelectContent>
                       </Select>
                     </div>
+                    {/* Index Number - lg:col-span-1 implied */}
                     <div className="space-y-1.5">
                       <Label
                         htmlFor={`indexNumber-${subject.id}`}
-                        className="lg:hidden"
+                        className="text-sm font-medium text-gray-600 lg:hidden"
                       >
                         Index Number
                       </Label>
@@ -542,13 +561,15 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading}
+                        className="w-full"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label className="lg:hidden">
+                    {/* Exam Date - Spans 2 cols on small, takes 1.5fr space on lg */}
+                    <div className="space-y-1.5 col-span-2 lg:col-span-1">
+                      <Label className="text-sm font-medium text-gray-600 lg:hidden">
                         Exam Date <span className="text-red-500">*</span>
                       </Label>
-                      <div className="flex gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         <Select
                           value={subject.examYear}
                           onValueChange={(value) =>
@@ -560,7 +581,10 @@ export function AcademicDetailsForm({
                           }
                           disabled={isLoading}
                         >
-                          <SelectTrigger aria-label="Exam Year">
+                          <SelectTrigger
+                            aria-label="Exam Year"
+                            className="w-full"
+                          >
                             <SelectValue placeholder="Year" />
                           </SelectTrigger>
                           <SelectContent>
@@ -582,7 +606,10 @@ export function AcademicDetailsForm({
                           }
                           disabled={isLoading}
                         >
-                          <SelectTrigger aria-label="Exam Month">
+                          <SelectTrigger
+                            aria-label="Exam Month"
+                            className="w-full"
+                          >
                             <SelectValue placeholder="Month" />
                           </SelectTrigger>
                           <SelectContent>
@@ -595,13 +622,14 @@ export function AcademicDetailsForm({
                         </Select>
                       </div>
                     </div>
-                    <div className="flex justify-end">
+                    {/* Remove Button - Spans 2 cols on small, takes auto space on lg */}
+                    <div className="flex justify-end items-end col-span-2 lg:col-span-1">
                       {electiveSubjects.length > 1 && (
                         <Button
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="text-red-500 hover:bg-red-50 hover:text-red-600 h-9 w-9 self-end"
+                          className="text-red-500 hover:bg-red-50 hover:text-red-600 h-9 w-9"
                           onClick={() => removeSubjectRow(subject.id)}
                           aria-label="Remove subject row"
                           disabled={isLoading}
@@ -627,13 +655,15 @@ export function AcademicDetailsForm({
                 disabled={isLoading}
               >
                 {" "}
-                <PlusCircle className="mr-2 h-4 w-4" /> Add Elective Subject{" "}
+                <PlusCircle className="mr-2 h-4 w-4" /> Add Elective
+                Subject{" "}
               </Button>
             </div>
           </div>
 
           <Separator />
 
+          {/* --- Core Subjects Section --- */}
           <div className="space-y-6">
             <div>
               <h4 className="text-base font-semibold text-gray-700 mb-1">
@@ -643,6 +673,7 @@ export function AcademicDetailsForm({
                 Input your best subjects and grades...
               </p>
             </div>
+            {/* Labels Row - Hidden below lg */}
             <div className="hidden lg:grid lg:grid-cols-[1.5fr_1fr_1fr_1.5fr] gap-x-4 px-1 pb-2 border-b">
               <Label>Subject</Label> <Label>Grade</Label>{" "}
               <Label>Index Number</Label>{" "}
@@ -661,20 +692,25 @@ export function AcademicDetailsForm({
                   key={subject.id}
                   className="border-b border-gray-200 pb-5 last:border-b-0 last:pb-0"
                 >
-                  <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr_1fr_1.5fr] gap-x-4 gap-y-3 items-end">
-                    <div className="space-y-1.5">
-                      <Label className="lg:hidden">Subject</Label>
+                  {/* Grid for Inputs: 2 cols default, 4 cols lg */}
+                  <div className="grid grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.5fr] gap-4 items-stretch">
+                    <div className="space-y-1.5 col-span-2 lg:col-span-1">
+                      {" "}
+                      <Label className="text-sm font-medium text-gray-600 lg:hidden">
+                        Subject
+                      </Label>{" "}
                       <div className="h-10 flex items-center px-3 text-sm text-gray-800 font-medium">
                         {subject.subjectName}
-                      </div>
+                      </div>{" "}
                     </div>
                     <div className="space-y-1.5">
+                      {" "}
                       <Label
                         htmlFor={`core-grade-${subject.id}`}
-                        className="lg:hidden"
+                        className="text-sm font-medium text-gray-600 lg:hidden"
                       >
                         Grade
-                      </Label>
+                      </Label>{" "}
                       <Select
                         value={subject.grade}
                         onValueChange={(value) =>
@@ -682,7 +718,10 @@ export function AcademicDetailsForm({
                         }
                         disabled={isLoading}
                       >
-                        <SelectTrigger id={`core-grade-${subject.id}`}>
+                        <SelectTrigger
+                          id={`core-grade-${subject.id}`}
+                          className="w-full"
+                        >
                           <SelectValue placeholder="Grade" />
                         </SelectTrigger>
                         <SelectContent>
@@ -692,15 +731,16 @@ export function AcademicDetailsForm({
                             </SelectItem>
                           ))}
                         </SelectContent>
-                      </Select>
+                      </Select>{" "}
                     </div>
                     <div className="space-y-1.5">
+                      {" "}
                       <Label
                         htmlFor={`core-indexNumber-${subject.id}`}
-                        className="lg:hidden"
+                        className="text-sm font-medium text-gray-600 lg:hidden"
                       >
                         Index Number
-                      </Label>
+                      </Label>{" "}
                       <Input
                         id={`core-indexNumber-${subject.id}`}
                         type="text"
@@ -714,13 +754,16 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading}
-                      />
+                        className="w-full"
+                      />{" "}
                     </div>
-                    <div className="space-y-1.5">
-                      <Label className="lg:hidden">
+                    <div className="space-y-1.5 col-span-2 lg:col-span-1">
+                      {" "}
+                      <Label className="text-sm font-medium text-gray-600 lg:hidden">
                         Exam Date <span className="text-red-500">*</span>
-                      </Label>
-                      <div className="flex gap-2">
+                      </Label>{" "}
+                      <div className="grid grid-cols-2 gap-2">
+                        {" "}
                         <Select
                           value={subject.examYear}
                           onValueChange={(value) =>
@@ -732,7 +775,10 @@ export function AcademicDetailsForm({
                           }
                           disabled={isLoading}
                         >
-                          <SelectTrigger aria-label="Core Exam Year">
+                          <SelectTrigger
+                            aria-label="Core Exam Year"
+                            className="w-full"
+                          >
                             <SelectValue placeholder="Year" />
                           </SelectTrigger>
                           <SelectContent>
@@ -742,7 +788,7 @@ export function AcademicDetailsForm({
                               </SelectItem>
                             ))}
                           </SelectContent>
-                        </Select>
+                        </Select>{" "}
                         <Select
                           value={subject.examMonth}
                           onValueChange={(value) =>
@@ -754,7 +800,10 @@ export function AcademicDetailsForm({
                           }
                           disabled={isLoading}
                         >
-                          <SelectTrigger aria-label="Core Exam Month">
+                          <SelectTrigger
+                            aria-label="Core Exam Month"
+                            className="w-full"
+                          >
                             <SelectValue placeholder="Month" />
                           </SelectTrigger>
                           <SelectContent>
@@ -764,8 +813,8 @@ export function AcademicDetailsForm({
                               </SelectItem>
                             ))}
                           </SelectContent>
-                        </Select>
-                      </div>
+                        </Select>{" "}
+                      </div>{" "}
                     </div>
                   </div>
                 </div>

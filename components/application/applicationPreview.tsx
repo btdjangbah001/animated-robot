@@ -210,7 +210,7 @@ export function ApplicationPreview({
               />
               <DetailItem
                 label="Institution Name"
-                value={application.institution?.title}
+                value={application.institution?.name}
               />
               <DetailItem
                 label="Program Name"

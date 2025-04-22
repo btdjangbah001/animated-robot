@@ -1,13 +1,20 @@
 "use client";
 
-import * as React from "react";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   ArrowLeft,
   ArrowRight,
-  User as UserIcon,
-  Paperclip,
-  X,
   Loader2,
+  Paperclip,
+  User as UserIcon,
+  X,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -27,10 +34,10 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import useApplicationStore from "@/store/applicationStore";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ApplicationInput, ApplicantInput } from "@/types/application";
+import { ApplicantInput, ApplicationInput } from "@/types/application";
 import axiosInstance from "@/lib/axios";
-import axios from "axios";
 import { DistrictOutput, RegionOutput } from "@/types/applicant";
+import { nationalities } from "@/lib/consts";
 
 interface PersonalDetailsFormProps {
   onNext: () => void;
@@ -61,8 +68,8 @@ interface PersonalDetailsState {
   parentContact: string;
 }
 
-const genderOptions = ["Male", "Female", "Other"];
-const nationalityOptions = ["Ghanaian", "Nigerian", "Togolese"];
+const genderOptions = ["MALE", "FEMALE"];
+const nationalityOptions = nationalities;
 const medicalConditions = [
   { id: "none", label: "None" },
   { id: "deaf", label: "DEAF" },
@@ -104,36 +111,36 @@ export function PersonalDetailsForm({
   onBack,
 }: PersonalDetailsFormProps) {
   const [formState, setFormState] =
-    React.useState<PersonalDetailsState>(initialFormState);
-  const [profilePhoto, setProfilePhoto] = React.useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
-  const [isFetchingPreview, setIsFetchingPreview] = React.useState(false);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+    useState<PersonalDetailsState>(initialFormState);
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isFetchingPreview, setIsFetchingPreview] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [initialValues, setInitialValues] =
+    useState<PersonalDetailsState | null>(null);
 
-  const [allRegions, setAllRegions] = React.useState<RegionOutput[]>([]);
-  const [birthDistrictOptions, setBirthDistrictOptions] = React.useState<
+  const [allRegions, setAllRegions] = useState<RegionOutput[]>([]);
+  const [birthDistrictOptions, setBirthDistrictOptions] = useState<
     DistrictOutput[]
   >([]);
-  const [contactDistrictOptions, setContactDistrictOptions] = React.useState<
+  const [contactDistrictOptions, setContactDistrictOptions] = useState<
     DistrictOutput[]
   >([]);
-  const [loadingRegions, setLoadingRegions] = React.useState(false);
-  const [loadingBirthDistricts, setLoadingBirthDistricts] =
-    React.useState(false);
-  const [loadingContactDistricts, setLoadingContactDistricts] =
-    React.useState(false);
-  const [localError, setLocalError] = React.useState<string | null>(null);
+  const [loadingRegions, setLoadingRegions] = useState(false);
+  const [loadingBirthDistricts, setLoadingBirthDistricts] = useState(false);
+  const [loadingContactDistricts, setLoadingContactDistricts] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const application = useApplicationStore((state) => state.application);
   const applicationId = useApplicationStore((state) => state.applicationId);
-  const updateApplication = useApplicationStore(
+  const updateApplicantDetails = useApplicationStore(
     (state) => state.updateApplication,
   );
   const isLoading = useApplicationStore((state) => state.isLoading);
   const error = useApplicationStore((state) => state.error);
   const setError = useApplicationStore((state) => state.setError);
 
-  const fetchRegions = React.useCallback(async () => {
+  const fetchRegions = useCallback(async () => {
     setLoadingRegions(true);
     setLocalError(null);
     try {
@@ -151,7 +158,7 @@ export function PersonalDetailsForm({
     }
   }, []);
 
-  const fetchDistricts = React.useCallback(
+  const fetchDistricts = useCallback(
     async (regionId: string, type: "birth" | "contact") => {
       if (!regionId) return;
       const setLoading =
@@ -183,23 +190,23 @@ export function PersonalDetailsForm({
     [],
   );
 
-  React.useEffect(() => {
-    fetchRegions().then(()=>{});
+  useEffect(() => {
+    fetchRegions();
   }, [fetchRegions]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (formState.birthRegionId)
-      fetchDistricts(formState.birthRegionId, "birth").then(()=>{});
+      fetchDistricts(formState.birthRegionId, "birth");
     else setBirthDistrictOptions([]);
   }, [formState.birthRegionId, fetchDistricts]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (formState.contactRegionId)
-      fetchDistricts(formState.contactRegionId, "contact").then(()=>{});
+      fetchDistricts(formState.contactRegionId, "contact");
     else setContactDistrictOptions([]);
   }, [formState.contactRegionId, fetchDistricts]);
 
-  const fetchPhotoPreviewUrl = React.useCallback(async (photoId: number) => {
+  const fetchPhotoPreviewUrl = useCallback(async (photoId: number) => {
     if (!photoId) return;
     setIsFetchingPreview(true);
     try {
@@ -215,7 +222,7 @@ export function PersonalDetailsForm({
     }
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (application?.applicant) {
       const app = application.applicant;
       const contact = app.contactInformation;
@@ -230,7 +237,7 @@ export function PersonalDetailsForm({
       const contactRegionIdStr = contact?.district?.regionId?.toString() ?? "";
       const contactDistrictIdStr = contact?.districtId?.toString() ?? "";
 
-      setFormState({
+      const loadedState: PersonalDetailsState = {
         firstName: app.firstName || "",
         middleName: app.middleName || "",
         lastName: app.lastName || "",
@@ -254,27 +261,32 @@ export function PersonalDetailsForm({
         email: app.email || "",
         parentName: contact?.contactPersonName || "",
         parentContact: contact?.contactPersonPhoneNUmber || "",
-      });
+      };
 
-      if (app.profilePhotoId && !profilePhoto) {
+      setFormState(loadedState);
+      setInitialValues(JSON.parse(JSON.stringify(loadedState)));
+
+      setProfilePhoto(null);
+      if (app.profilePhotoId) {
         fetchPhotoPreviewUrl(app.profilePhotoId);
-      } else if (!app.profilePhotoId) {
+      } else {
         setPhotoPreview(null);
       }
     } else {
       setFormState(initialFormState);
+      setInitialValues(null);
       setPhotoPreview(null);
       setProfilePhoto(null);
     }
-  }, [application, fetchPhotoPreviewUrl, profilePhoto]);
+  }, [application, fetchPhotoPreviewUrl]);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (
-    name: keyof PersonalDetailsState,
+    name: keyof Omit<PersonalDetailsState, "selectedConditions">,
     value: string,
   ) => {
     setFormState((prev) => ({ ...prev, [name]: value }));
@@ -308,15 +320,20 @@ export function PersonalDetailsForm({
     });
   };
 
-  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      if (file.size > 200 * 1024) {
+        alert("File is too large! Maximum size is 200KB.");
+        event.target.value = "";
+        return;
+      }
       setProfilePhoto(file);
       setPhotoPreview(URL.createObjectURL(file));
     } else {
       setProfilePhoto(null);
       if (application?.applicant?.profilePhotoId) {
-        fetchPhotoPreviewUrl(application.applicant.profilePhotoId).then(()=>{});
+        fetchPhotoPreviewUrl(application.applicant.profilePhotoId);
       } else {
         setPhotoPreview(null);
       }
@@ -343,35 +360,55 @@ export function PersonalDetailsForm({
     onBack();
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
     setLocalError(null);
-    if (!applicationId) {
-      setError("Cannot save progress: Application ID not found.");
+    if (!applicationId || !application?.applicant?.id) {
+      setError("Application/Applicant ID not found.");
+      return;
+    }
+
+    const isPhotoDirty = profilePhoto !== null;
+    let isFormDirty = false;
+    if (initialValues) {
+      isFormDirty = JSON.stringify(formState) !== JSON.stringify(initialValues);
+    } else {
+      isFormDirty = Object.values(formState).some((value) => {
+        if (Array.isArray(value))
+          return value.length > 0 && (value.length > 1 || value[0] !== "none");
+        return value !== "" && value !== null;
+      });
+    }
+    const isDirty = isPhotoDirty || isFormDirty;
+
+    if (!isDirty) {
+      onNext();
       return;
     }
 
     let profilePhotoIdToSubmit: number | null =
-      application?.applicant?.profilePhotoId ?? null;
+      application.applicant.profilePhotoId ?? null;
 
     if (profilePhoto) {
-      setError("Uploading photo...");
       try {
         const presignResponse = await axiosInstance.post(
           "/api/v1.0/files/upload",
           { name: profilePhoto.name },
         );
         const { id: newPhotoId, signedUrl } = presignResponse.data;
+        console.log(presignResponse.data);
         if (!signedUrl || !newPhotoId)
           throw new Error("Failed to get photo upload destination.");
-        await axios.put(signedUrl, profilePhoto, {
+        const uploadResponse = await fetch(signedUrl, {
+          method: "PUT",
           headers: { "Content-Type": profilePhoto.type },
+          body: profilePhoto,
         });
+        if (!uploadResponse.ok) throw new Error("Failed to upload photo.");
         profilePhotoIdToSubmit = newPhotoId;
         setError(null);
       } catch (uploadError: any) {
-        console.error("Photo upload failed:", uploadError);
         setError(
           `Photo upload failed: ${uploadError.message || "Please try again."}`,
         );
@@ -407,16 +444,20 @@ export function PersonalDetailsForm({
         digitalAddress: formState.digitalAddress || null,
         contactPersonName: formState.parentName || null,
         contactPersonPhoneNUmber: formState.parentContact || null,
+        phoneNumber: formState.phone,
+        email: formState.email,
       },
     };
 
     const payload: Partial<ApplicationInput> = {
       applicant: applicantPayload,
-      registrationStage: "PERSONAL_DETAILS",
+      registrationStage: "COMPLETED",
     };
 
-    const success = await updateApplication(payload);
+    const success = await updateApplicantDetails(payload);
     if (success) {
+      setInitialValues(JSON.parse(JSON.stringify(formState)));
+      setProfilePhoto(null);
       onNext();
     }
   };
@@ -442,6 +483,7 @@ export function PersonalDetailsForm({
             </Alert>
           )}
 
+          {/* Section 1: Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="firstName">
@@ -490,7 +532,7 @@ export function PersonalDetailsForm({
                 required
                 disabled={isLoading}
               >
-                <SelectTrigger id="gender">
+                <SelectTrigger id="gender" className="w-full">
                   <SelectValue placeholder="Select Gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -556,7 +598,7 @@ export function PersonalDetailsForm({
                 required
                 disabled={isLoading}
               >
-                <SelectTrigger id="nationality">
+                <SelectTrigger id="nationality" className="w-full">
                   <SelectValue placeholder="Select Nationality" />
                 </SelectTrigger>
                 <SelectContent>
@@ -581,7 +623,7 @@ export function PersonalDetailsForm({
                 required
                 disabled={isLoading || loadingRegions}
               >
-                <SelectTrigger id="birthRegionId">
+                <SelectTrigger id="birthRegionId" className="w-full">
                   <SelectValue placeholder="Select Region" />
                 </SelectTrigger>
                 <SelectContent>
@@ -614,7 +656,7 @@ export function PersonalDetailsForm({
                   isLoading || loadingBirthDistricts || !formState.birthRegionId
                 }
               >
-                <SelectTrigger id="birthDistrictId">
+                <SelectTrigger id="birthDistrictId" className="w-full">
                   <SelectValue
                     placeholder={
                       !formState.birthRegionId
@@ -659,10 +701,7 @@ export function PersonalDetailsForm({
               Medical Condition / Disability{" "}
               <span className="text-red-500">*</span>
             </Label>
-            <p className="text-sm text-muted-foreground">
-              Please select any conditions that apply. Select `None` if none
-              apply.
-            </p>
+            <p className="text-sm text-muted-foreground">{`Please select any conditions that apply. Select "None" if none apply.`}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3 pt-1">
               {medicalConditions.map((condition) => (
                 <div key={condition.id} className="flex items-center space-x-2">
@@ -759,16 +798,17 @@ export function PersonalDetailsForm({
             </div>
             <div className="flex justify-center md:justify-end">
               <Avatar className="h-28 w-28 border">
+                {" "}
                 <AvatarImage
                   src={photoPreview ?? undefined}
                   alt="Photo preview"
-                />
+                />{" "}
                 <AvatarFallback
                   className={cn(isFetchingPreview && "animate-pulse")}
                 >
                   {" "}
                   <UserIcon className="h-12 w-12 text-gray-400" />{" "}
-                </AvatarFallback>
+                </AvatarFallback>{" "}
               </Avatar>
             </div>
           </div>
@@ -819,7 +859,7 @@ export function PersonalDetailsForm({
                   required
                   disabled={isLoading || loadingRegions}
                 >
-                  <SelectTrigger id="contactRegionId">
+                  <SelectTrigger id="contactRegionId" className="w-full">
                     <SelectValue placeholder="Select Region" />
                   </SelectTrigger>
                   <SelectContent>
@@ -854,7 +894,7 @@ export function PersonalDetailsForm({
                     !formState.contactRegionId
                   }
                 >
-                  <SelectTrigger id="contactDistrictId">
+                  <SelectTrigger id="contactDistrictId" className="w-full">
                     <SelectValue
                       placeholder={
                         !formState.contactRegionId
