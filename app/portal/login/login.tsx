@@ -8,6 +8,7 @@ import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {AxiosError} from "axios";
+import {toast} from "react-toastify";
 
 export const Login = () => {
     const [pin, setPin] = React.useState("");
@@ -43,7 +44,7 @@ export const Login = () => {
                 errorMessage = err.message;
             }
             setError(errorMessage);
-            console.error("Login failed:", err);
+            toast.error(errorMessage);
         }
     };
 

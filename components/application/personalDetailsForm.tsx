@@ -16,7 +16,7 @@ import useApplicationStore from "@/store/applicationStore";
 import {ApplicantInput} from "@/types/application";
 import axiosInstance from "@/lib/axios";
 import {DistrictOutput, RegionOutput} from "@/types/applicant";
-import {countries, nationalities} from "@/lib/consts";
+import {countries, mapStageToStepId, nationalities} from "@/lib/consts";
 import {toast} from "react-toastify";
 
 interface PersonalDetailsFormProps {
@@ -87,8 +87,15 @@ export function PersonalDetailsForm({
   onNext,
   onBack,
 }: PersonalDetailsFormProps) {
+  const application = useApplicationStore((state) => state.application);
   const [formState, setFormState] =
-    useState<PersonalDetailsState>(initialFormState);
+    useState<PersonalDetailsState>({...initialFormState,
+      contactDistrictId: application?.applicant?.contactInformation?.district?.id?.toString() ?? "",
+      contactRegionId: application?.applicant?.contactInformation?.district?.regionId?.toString() ?? "",
+      gender: application?.applicant?.gender === "MALE" ? "Male" : "Female",
+      nationality: application?.applicant?.nationality ?? "",
+      country: application?.applicant?.country ?? "",
+    });
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isFetchingPreview, setIsFetchingPreview] = useState(false);
@@ -103,7 +110,6 @@ export function PersonalDetailsForm({
   const [loadingRegions, setLoadingRegions] = useState(false);
   const [loadingContactDistricts, setLoadingContactDistricts] = useState(false);
 
-  const application = useApplicationStore((state) => state.application);
   const applicationId = useApplicationStore((state) => state.applicationId);
   const updateApplicantDetails = useApplicationStore(
     (state) => state.updateApplicantDetails,
@@ -407,7 +413,9 @@ export function PersonalDetailsForm({
       toast.error("Could not update applicant details")
       return;
     }
-    const success = await updateApplication({registrationStage: "DRAFT",});
+    const success = await updateApplication({registrationStage: mapStageToStepId(application?.registrationStage ?? "PERSONAL_DETAILS") <= mapStageToStepId("PERSONAL_DETAILS")
+          ? "DRAFT"
+          :  application?.registrationStage});
     if (success) {
       setProfilePhoto(null);
       onNext();
@@ -437,7 +445,7 @@ export function PersonalDetailsForm({
                 value={formState.firstName}
                 onChange={handleInputChange}
                 required
-                disabled={isLoading}
+                disabled={true}
               />
             </div>
             <div className="space-y-1.5">
@@ -462,7 +470,7 @@ export function PersonalDetailsForm({
                 value={formState.lastName}
                 onChange={handleInputChange}
                 required
-                disabled={isLoading}
+                disabled={true}
               />
             </div>
             <div className="space-y-1.5">
@@ -844,7 +852,7 @@ export function PersonalDetailsForm({
                   value={formState.email}
                   onChange={handleInputChange}
                   required
-                  disabled={isLoading}
+                  disabled={true}
                 />
               </div>
             </div>

@@ -398,3 +398,25 @@ export const countries: string[] = [
     "Zimbabwe",
 ];
 
+export type RegistrationStage =
+    "PROGRAM_DETAILS"
+    | "ACADEMIC_DETAILS"
+    | "PERSONAL_DETAILS"
+    | "SUBMITTED"
+    | "DRAFT"
+
+export const mapStageToStepId = (stage: RegistrationStage | null ): number => {
+    switch (stage) {
+        case "PROGRAM_DETAILS":
+            return 1;
+        case "ACADEMIC_DETAILS":
+            return 2;
+        case "PERSONAL_DETAILS":
+            return 3;
+        case "SUBMITTED":
+        case "DRAFT":
+            return 4;
+        default:
+            return 1;
+    }
+};

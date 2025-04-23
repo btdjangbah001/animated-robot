@@ -12,6 +12,7 @@ import useApplicationStore from "@/store/applicationStore";
 import {ApplicationInput, CoreResultInput, ElectiveResultInput,} from "@/types/application";
 import {SubjectOutput} from "@/types/applicant";
 import {toast} from "react-toastify";
+import {mapStageToStepId} from "@/lib/consts";
 
 interface ElectiveSubjectLocal {
   id: string;
@@ -52,13 +53,13 @@ export function AcademicDetailsForm({
   onNext,
   onBack,
 }: AcademicDetailsFormProps) {
-  const [applicationType, setApplicationType] = useState<string>("");
+  const application = useApplicationStore((state) => state.application);
+  const [applicationType, setApplicationType] = useState<string>(application?.examinationType ?? "");
   const [electiveSubjects, setElectiveSubjects] = useState<
     ElectiveSubjectLocal[]
   >([]);
   const [coreSubjects, setCoreSubjects] = useState<CoreSubjectLocal[]>([]);
 
-  const application = useApplicationStore((state) => state.application);
   const applicationId = useApplicationStore((state) => state.applicationId);
   const updateApplication = useApplicationStore(
     (state) => state.updateApplication,
@@ -300,7 +301,9 @@ export function AcademicDetailsForm({
       examinationType: applicationType,
       electiveResults: mappedElectiveResults,
       coreResults: mappedCoreResults,
-      registrationStage: "PERSONAL_DETAILS",
+          registrationStage: mapStageToStepId(application?.registrationStage ?? "ACADEMIC_DETAILS") <= mapStageToStepId("ACADEMIC_DETAILS")
+              ? "PERSONAL_DETAILS"
+              :  application?.registrationStage,
     };
 
     const success = await updateApplication(payload);
@@ -344,7 +347,6 @@ export function AcademicDetailsForm({
           </div>
           <Separator />
 
-          {/* --- Elective Subjects Section --- */}
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-1">
@@ -360,8 +362,6 @@ export function AcademicDetailsForm({
                 Input your best subjects and grades...
               </p>
             </div>
-            {/* Labels Row - Hidden below lg */}
-            {/* Adjusted lg grid definition to match input row */}
             <div className="hidden lg:grid lg:grid-cols-[1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-x-4 px-1 pb-2 border-b">
               <Label>Waec Course</Label> <Label>Subject</Label>{" "}
               <Label>Grade</Label> <Label>Index Number</Label>{" "}
@@ -376,9 +376,7 @@ export function AcademicDetailsForm({
                   key={subject.id}
                   className="border-b border-gray-200 pb-5 last:border-b-0 last:pb-0"
                 >
-                  {/* Grid for Inputs: 2 cols default, custom fr units on lg */}
                   <div className="grid grid-cols-2 lg:grid-cols-[1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-4 items-stretch">
-                    {/* Waec Course - lg:col-span-1 implied by grid definition */}
                     <div className="space-y-1.5">
                       <Label
                         htmlFor={`waecCourse-${subject.id}`}

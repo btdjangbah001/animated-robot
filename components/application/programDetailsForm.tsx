@@ -7,6 +7,7 @@ import {Label} from "@/components/ui/label";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import useApplicationStore from "@/store/applicationStore";
 import {ApplicationInput} from "@/types/application";
+import {mapStageToStepId} from "@/lib/consts";
 
 interface ProgramDetailsFormProps {
   onNext: () => void;
@@ -19,15 +20,16 @@ interface InitialProgramDetails {
 }
 
 export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
+  const application = useApplicationStore((state) => state.application);
+
   const [selectedProgramTypeId, setSelectedProgramTypeId] =
-    useState<string>("");
+    useState<string>(application?.program?.programTypeId?.toString() ?? "");
   const [selectedInstitutionId, setSelectedInstitutionId] =
-    useState<string>("");
-  const [selectedProgramId, setSelectedProgramId] = useState<string>("");
+    useState<string>(application?.institutionId?.toString() ?? "");
+  const [selectedProgramId, setSelectedProgramId] = useState<string>(application?.programId?.toString() ?? "");
   const [initialValues, setInitialValues] =
     useState<InitialProgramDetails | null>(null);
 
-  const application = useApplicationStore((state) => state.application);
   const applicationId = useApplicationStore((state) => state.applicationId);
   const updateApplication = useApplicationStore(
     (state) => state.updateApplication,
@@ -164,7 +166,9 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
     const payload: Partial<ApplicationInput> = {
       institutionId: Number(selectedInstitutionId),
       programId: Number(selectedProgramId),
-      registrationStage: "ACADEMIC_DETAILS",
+      registrationStage: mapStageToStepId(application?.registrationStage ?? "PROGRAM_DETAILS") <= mapStageToStepId("PROGRAM_DETAILS")
+          ? "ACADEMIC_DETAILS"
+          :  application?.registrationStage,
     };
 
     const success = await updateApplication(payload);
