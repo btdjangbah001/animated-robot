@@ -1,3 +1,5 @@
+import {RegistrationStage} from "@/lib/consts";
+
 export interface ProgramTypeOutput {
     id: number;
     title: string | null;
@@ -108,7 +110,7 @@ export interface ApplicationOutput {
     institution: InstitutionOutput | null;
     program: ProgramOutput | null;
     examinationType: "WASSCE" | "SSSCE" | string | null;
-    registrationStage: "PROGRAM_DETAILS" | "ACADEMIC_DETAILS" | "PERSONAL_DETAILS" | "COMPLETED" | string | null;
+    registrationStage: RegistrationStage;
     submissionDate: number | null; // Timestamp
     applicant: ApplicantOutput | null;
     electiveResults: ElectiveResultOutput[] | null;

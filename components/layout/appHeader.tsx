@@ -1,19 +1,9 @@
 "use client";
 
 import Link from "next/link";
-// import { usePathname } from 'next/navigation'; // Keep for active state if needed
-import {
-  Bell,
-  GraduationCap,
-  User,
-  LayoutDashboard,
-  FileText,
-  Download,
-  Printer,
-  LogOut,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {Download, GraduationCap, LogOut, Printer, User,} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,21 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+import {cn} from "@/lib/utils";
+import useApplicationStore from "@/store/applicationStore";
+import {useEffect} from "react";
+import useAuthStore from "@/store/authStore";
 
 const navItems = [
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    activeSlug: "/dashboard",
-  },
-  {
-    href: "/application/form",
-    label: "My Form",
-    icon: FileText,
-    activeSlug: "/application",
-  },
   {
     href: "/downloads",
     label: "Download",
@@ -47,14 +28,19 @@ const navItems = [
 ];
 
 export function AppHeader() {
-  // TODO: Replace with actual user data and notification count
-  const notificationCount = 3;
-  const userName = "Applicant Name";
-  // const pathname = usePathname(); // Get current path for active state
-  const currentPath = "/application/form"; // Placeholder
+  const applicationId = useApplicationStore(state => state.applicationId);
+  const application = useApplicationStore(state => state.application);
+  const fetchApplication = useApplicationStore(state => state.fetchApplication);
+  const logout = useAuthStore(state => state.logout);
+
+  useEffect(() => {
+    if (!application) fetchApplication(applicationId ?? null).then(()=>{})
+  }, [application, applicationId, fetchApplication]);
+
+  const currentPath = "/application/form";
 
   const handleLogout = () => {
-    console.log("Logging out...");
+    logout();
   };
 
   return (
@@ -75,12 +61,6 @@ export function AppHeader() {
           size="icon"
           className="relative rounded-full h-10 w-10"
         >
-          <Bell className="h-5 w-5 text-gray-600" />
-          {notificationCount > 0 && (
-            <span className="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white">
-              {notificationCount}
-            </span>
-          )}
           <span className="sr-only">Notifications</span>
         </Button>
 
@@ -96,9 +76,9 @@ export function AppHeader() {
           <DropdownMenuContent className="w-56 mr-4" align="end">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{userName}</p>
+                <p className="text-sm font-medium leading-none">{application?.applicant?.firstName + " " + application?.applicant?.lastName}</p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  user@example.com
+                  {application?.applicant?.email}
                 </p>
               </div>
             </DropdownMenuLabel>

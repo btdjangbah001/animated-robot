@@ -1,30 +1,42 @@
 "use client";
-import { FormEvent, useEffect, useState } from "react";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import React, {FormEvent, useEffect, useState} from "react";
+import {ArrowRight, Loader2} from "lucide-react";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Label} from "@/components/ui/label";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import useApplicationStore from "@/store/applicationStore";
+import {ApplicationInput} from "@/types/application";
+import {mapStageToStepId} from "@/lib/consts";
 
 interface ProgramDetailsFormProps {
   onNext: () => void;
 }
 
-export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
-  const [selectedProgramTypeId, setSelectedProgramTypeId] =
-    useState<string>("");
-  const [selectedInstitutionId, setSelectedInstitutionId] =
-    useState<string>("");
-  const [selectedProgramId, setSelectedProgramId] = useState<string>("");
+interface InitialProgramDetails {
+  programTypeId: string;
+  institutionId: string;
+  programId: string;
+}
 
+export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
+  const application = useApplicationStore((state) => state.application);
+
+  const [selectedProgramTypeId, setSelectedProgramTypeId] =
+    useState<string>(application?.program?.programTypeId?.toString() ?? "");
+  const [selectedInstitutionId, setSelectedInstitutionId] =
+    useState<string>(application?.institutionId?.toString() ?? "");
+  const [selectedProgramId, setSelectedProgramId] = useState<string>(application?.programId?.toString() ?? "");
+  const [initialValues, setInitialValues] =
+    useState<InitialProgramDetails | null>(null);
+
+  const applicationId = useApplicationStore((state) => state.applicationId);
+  const updateApplication = useApplicationStore(
+    (state) => state.updateApplication,
+  );
+  const isLoading = useApplicationStore((state) => state.isLoading);
+  const error = useApplicationStore((state) => state.error);
+  const setError = useApplicationStore((state) => state.setError);
   const programTypes = useApplicationStore((state) => state.programTypes);
   const institutions = useApplicationStore((state) => state.institutions);
   const programs = useApplicationStore((state) => state.programs);
@@ -37,8 +49,9 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
   const isLoadingPrograms = useApplicationStore(
     (state) => state.isLoadingPrograms,
   );
-  const dropdownError = useApplicationStore((state) => state.dropdownError);
-  const fetchApplication = useApplicationStore((state) => state.fetchApplication);
+  const fetchApplication = useApplicationStore(
+    (state) => state.fetchApplication,
+  );
   const fetchProgramTypes = useApplicationStore(
     (state) => state.fetchProgramTypes,
   );
@@ -50,23 +63,19 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
     (state) => state.clearInstitutions,
   );
   const clearPrograms = useApplicationStore((state) => state.clearPrograms);
-  const updateApplication = useApplicationStore(
-    (state) => state.updateApplication,
-  );
-  const applicationId = useApplicationStore((state) => state.applicationId);
-  const application = useApplicationStore((state) => state.application);
-  const isLoading = useApplicationStore((state) => state.isLoading);
-  const error = useApplicationStore((state) => state.error);
-  const setError = useApplicationStore((state) => state.setError);
 
   useEffect(() => {
-    if (programTypes.length === 0) {
-      fetchProgramTypes().then(() => {});
-    }
-    if (!application && !isLoading && !error) {
-      fetchApplication().then(()=>{});
-    }
-  }, [application, error, fetchApplication, fetchProgramTypes, isLoading, programTypes.length]);
+    if (!application && !isLoading && !error) fetchApplication().then(() => {});
+    if (programTypes.length === 0) fetchProgramTypes().then(() => {});
+  }, [
+    fetchProgramTypes,
+    programTypes.length,
+    application,
+    isLoading,
+    error,
+    fetchApplication,
+  ]);
+
 
   useEffect(() => {
     if (application) {
@@ -78,6 +87,15 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
       setSelectedProgramTypeId(initialProgramTypeId);
       setSelectedInstitutionId(initialInstitutionId);
       setSelectedProgramId(initialProgramId);
+
+      setInitialValues({
+        programTypeId: initialProgramTypeId,
+        institutionId: initialInstitutionId,
+        programId: initialProgramId,
+      });
+
+      console.log(application);
+      console.log(initialValues);
     }
   }, [application]);
 
@@ -87,8 +105,6 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
     } else {
       clearInstitutions();
     }
-    setSelectedInstitutionId("");
-    setSelectedProgramId("");
   }, [selectedProgramTypeId, fetchInstitutions, clearInstitutions]);
 
   useEffect(() => {
@@ -99,7 +115,6 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
     } else {
       clearPrograms();
     }
-    setSelectedProgramId("");
   }, [
     selectedInstitutionId,
     selectedProgramTypeId,
@@ -109,10 +124,13 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
 
   const handleProgramTypeChange = (value: string) => {
     setSelectedProgramTypeId(value);
+    setSelectedInstitutionId("");
+    setSelectedProgramId("");
   };
 
   const handleInstitutionChange = (value: string) => {
     setSelectedInstitutionId(value);
+    setSelectedProgramId("");
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -132,37 +150,49 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
       return;
     }
 
-    const payload = {
+    const isDirty =
+      selectedProgramTypeId !== initialValues?.programTypeId ||
+      selectedInstitutionId !== initialValues?.institutionId ||
+      selectedProgramId !== initialValues?.programId;
+
+    if (!isDirty) {
+      console.log(
+        "No changes detected in Program Details, proceeding to next step.",
+      );
+      onNext();
+      return;
+    }
+
+    const payload: Partial<ApplicationInput> = {
       institutionId: Number(selectedInstitutionId),
       programId: Number(selectedProgramId),
-      // programTypeId might be implicitly set via programId on backend
-      registrationStage: "PROGRAM_DETAILS",
+      registrationStage: mapStageToStepId(application?.registrationStage ?? "PROGRAM_DETAILS") <= mapStageToStepId("PROGRAM_DETAILS")
+          ? "ACADEMIC_DETAILS"
+          :  application?.registrationStage,
     };
 
     const success = await updateApplication(payload);
     if (success) {
+      setInitialValues({
+        programTypeId: selectedProgramTypeId,
+        institutionId: selectedInstitutionId,
+        programId: selectedProgramId,
+      });
       onNext();
     }
   };
 
-  const displayError = error || dropdownError;
-
   return (
     <Card className="w-full shadow-sm">
       <CardHeader>
+        {" "}
         <CardTitle className="text-xl font-semibold text-gray-900">
           {" "}
           Program Details{" "}
-        </CardTitle>
+        </CardTitle>{" "}
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit}>
-          {displayError && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{displayError}</AlertDescription>
-            </Alert>
-          )}
           <div className="grid gap-6">
             <div className="space-y-2">
               <Label htmlFor="program-type">
@@ -178,7 +208,8 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
                   id="program-type"
                   className="w-full focus:ring-green-500"
                 >
-                  <SelectValue placeholder="Select program type..." />
+                  {" "}
+                  <SelectValue placeholder="Select program type..." />{" "}
                 </SelectTrigger>
                 <SelectContent>
                   {isLoadingProgramTypes ? (
@@ -195,7 +226,6 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="institution">
                 Institution <span className="text-red-500">*</span>
@@ -212,13 +242,14 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
                   id="institution"
                   className="w-full focus:ring-green-500"
                 >
+                  {" "}
                   <SelectValue
                     placeholder={
                       !selectedProgramTypeId
                         ? "Select program type first"
                         : "Select institution..."
                     }
-                  />
+                  />{" "}
                 </SelectTrigger>
                 <SelectContent>
                   {isLoadingInstitutions ? (
@@ -228,14 +259,13 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
                   ) : (
                     institutions.map((inst) => (
                       <SelectItem key={inst.id} value={inst.id.toString()}>
-                        {inst.name}
+                        {inst.name ?? inst.title}
                       </SelectItem>
                     ))
                   )}
                 </SelectContent>
               </Select>
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="program">
                 Program <span className="text-red-500">*</span>
@@ -252,13 +282,14 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
                   id="program"
                   className="w-full focus:ring-green-500"
                 >
+                  {" "}
                   <SelectValue
                     placeholder={
                       !selectedInstitutionId
                         ? "Select institution first"
                         : "Select program..."
                     }
-                  />
+                  />{" "}
                 </SelectTrigger>
                 <SelectContent>
                   {isLoadingPrograms ? (
@@ -276,15 +307,17 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
               </Select>
             </div>
           </div>
-
           <div className="flex justify-end mt-8">
             <Button
               type="submit"
               className="bg-green-500 hover:bg-green-600"
-              disabled={isLoading || !selectedProgramId}
+              disabled={isLoading || !selectedProgramId || !applicationId}
             >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Next <ArrowRight className="ml-2 h-4 w-4" />
+              {" "}
+              {isLoading && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}{" "}
+              Next <ArrowRight className="ml-2 h-4 w-4" />{" "}
             </Button>
           </div>
         </form>

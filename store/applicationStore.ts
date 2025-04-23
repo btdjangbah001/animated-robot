@@ -1,8 +1,8 @@
-import { create } from 'zustand';
+import {create} from 'zustand';
 import axiosInstance from '@/lib/axios';
-import { AxiosError } from 'axios';
+import {AxiosError} from 'axios';
 import {ApplicantOutput, ApplicationOutput, SubjectOutput} from "@/types/applicant";
-import {ApplicationInput} from "@/types/application";
+import {ApplicantInput, ApplicationInput} from "@/types/application";
 
 interface OptionType {
     id: number;
@@ -31,6 +31,7 @@ interface ApplicationState {
 interface ApplicationActions {
     fetchApplication: () => Promise<void>;
     updateApplication: (payload: Partial<ApplicationInput>) => Promise<boolean>;
+    updateApplicantDetails: (payload: ApplicantInput) => Promise<boolean>;
     setLoading: (isLoading: boolean) => void;
     setError: (error: string | null) => void;
     clearApplication: () => void;
@@ -82,8 +83,8 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
                 applicationId: appData?.id ?? null,
                 isLoading: false,
             });
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            console.error("Failed to fetch application:", error);
             set({ isLoading: false, error: "Failed to load application data.", application: null, applicationId: null });
         }
     },
@@ -106,6 +107,24 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
             if (error instanceof AxiosError && error.response?.data?.message) {
                 message = error.response.data.message;
             }
+            set({ isLoading: false, error: message });
+            return false;
+        }
+    },
+
+    updateApplicantDetails: async (payload: ApplicantInput): Promise<boolean> => {
+        const applicantId = get().application?.applicant?.id;
+        if (!applicantId) { set({ error: "Applicant ID is missing. Cannot update details." }); return false; }
+        set({ isLoading: true, error: null });
+        try {
+            await axiosInstance.put(`/api/v1.0/applicants/${applicantId}`, payload);
+            await get().fetchApplication();
+            set({ isLoading: false });
+            return true;
+        } catch (error) {
+            console.error("Failed to update applicant details:", error);
+            let message = "Failed to save personal details.";
+            if (error instanceof AxiosError && error.response?.data?.message) { message = error.response.data.message; }
             set({ isLoading: false, error: message });
             return false;
         }
@@ -153,10 +172,11 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
         set({ isLoadingWaecCourses: true, dropdownError: null });
         try {
             const response = await axiosInstance.post('/api/v1.0/waec-courses/search', {}, { params: { size: 100 } });
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const formattedCourses = response.data?.content?.map((c: any) => ({ id: c.id, title: c.name })) || [];
             set({ waecCourses: formattedCourses, isLoadingWaecCourses: false });
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            console.error("Failed to fetch WAEC courses:", error);
             set({ isLoadingWaecCourses: false, dropdownError: "Failed to load WAEC courses." });
         }
     },
@@ -169,8 +189,8 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
             };
             const response = await axiosInstance.post('/api/v1.0/subjects/search', queryPayload, { params: { size: 10 } });
             set({ coreSubjectsOptions: response.data?.content || [], isLoadingCoreSubjects: false });
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
-            console.error("Failed to fetch core subjects:", error);
             set({ isLoadingCoreSubjects: false, dropdownError: "Failed to load core subjects." });
         }
     },

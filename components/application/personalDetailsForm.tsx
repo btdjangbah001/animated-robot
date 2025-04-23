@@ -1,36 +1,23 @@
 "use client";
 
-import * as React from "react";
-import {
-  ArrowLeft,
-  ArrowRight,
-  User as UserIcon,
-  Paperclip,
-  X,
-  Loader2,
-} from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import React, {ChangeEvent, FormEvent, useCallback, useEffect, useRef, useState,} from "react";
+import {ArrowLeft, ArrowRight, Loader2, Paperclip, User as UserIcon, X,} from "lucide-react";
+import {format} from "date-fns";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
+import {Checkbox} from "@/components/ui/checkbox";
+import {Separator} from "@/components/ui/separator";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import useApplicationStore from "@/store/applicationStore";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ApplicationInput, ApplicantInput } from "@/types/application";
+import {ApplicantInput} from "@/types/application";
 import axiosInstance from "@/lib/axios";
-import axios from "axios";
-import { DistrictOutput, RegionOutput } from "@/types/applicant";
+import {DistrictOutput, RegionOutput} from "@/types/applicant";
+import {countries, mapStageToStepId, nationalities} from "@/lib/consts";
+import {toast} from "react-toastify";
 
 interface PersonalDetailsFormProps {
   onNext: () => void;
@@ -46,8 +33,6 @@ interface PersonalDetailsState {
   birthPlace: string;
   country: string;
   nationality: string;
-  birthRegionId: string;
-  birthDistrictId: string;
   languagesSpoken: string;
   selectedConditions: string[];
   address: string;
@@ -61,8 +46,9 @@ interface PersonalDetailsState {
   parentContact: string;
 }
 
-const genderOptions = ["Male", "Female", "Other"];
-const nationalityOptions = ["Ghanaian", "Nigerian", "Togolese"];
+const genderOptions = ["Male", "Female"];
+const nationalityOptions = nationalities;
+const countryOptions = countries;
 const medicalConditions = [
   { id: "none", label: "None" },
   { id: "deaf", label: "DEAF" },
@@ -84,8 +70,6 @@ const initialFormState: PersonalDetailsState = {
   birthPlace: "",
   country: "",
   nationality: "",
-  birthRegionId: "",
-  birthDistrictId: "",
   languagesSpoken: "",
   selectedConditions: ["none"],
   address: "",
@@ -103,39 +87,40 @@ export function PersonalDetailsForm({
   onNext,
   onBack,
 }: PersonalDetailsFormProps) {
-  const [formState, setFormState] =
-    React.useState<PersonalDetailsState>(initialFormState);
-  const [profilePhoto, setProfilePhoto] = React.useState<File | null>(null);
-  const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
-  const [isFetchingPreview, setIsFetchingPreview] = React.useState(false);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-  const [allRegions, setAllRegions] = React.useState<RegionOutput[]>([]);
-  const [birthDistrictOptions, setBirthDistrictOptions] = React.useState<
-    DistrictOutput[]
-  >([]);
-  const [contactDistrictOptions, setContactDistrictOptions] = React.useState<
-    DistrictOutput[]
-  >([]);
-  const [loadingRegions, setLoadingRegions] = React.useState(false);
-  const [loadingBirthDistricts, setLoadingBirthDistricts] =
-    React.useState(false);
-  const [loadingContactDistricts, setLoadingContactDistricts] =
-    React.useState(false);
-  const [localError, setLocalError] = React.useState<string | null>(null);
-
   const application = useApplicationStore((state) => state.application);
+  const [formState, setFormState] =
+    useState<PersonalDetailsState>({...initialFormState,
+      contactDistrictId: application?.applicant?.contactInformation?.district?.id?.toString() ?? "",
+      contactRegionId: application?.applicant?.contactInformation?.district?.regionId?.toString() ?? "",
+      gender: application?.applicant?.gender === "MALE" ? "Male" : "Female",
+      nationality: application?.applicant?.nationality ?? "",
+      country: application?.applicant?.country ?? "",
+    });
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isFetchingPreview, setIsFetchingPreview] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [initialValues, setInitialValues] =
+    useState<PersonalDetailsState | null>(null);
+
+  const [allRegions, setAllRegions] = useState<RegionOutput[]>([]);
+  const [contactDistrictOptions, setContactDistrictOptions] = useState<
+    DistrictOutput[]
+  >([]);
+  const [loadingRegions, setLoadingRegions] = useState(false);
+  const [loadingContactDistricts, setLoadingContactDistricts] = useState(false);
+
   const applicationId = useApplicationStore((state) => state.applicationId);
-  const updateApplication = useApplicationStore(
-    (state) => state.updateApplication,
+  const updateApplicantDetails = useApplicationStore(
+    (state) => state.updateApplicantDetails,
   );
+  const updateApplication = useApplicationStore(state => state.updateApplication)
   const isLoading = useApplicationStore((state) => state.isLoading);
   const error = useApplicationStore((state) => state.error);
   const setError = useApplicationStore((state) => state.setError);
 
-  const fetchRegions = React.useCallback(async () => {
+  const fetchRegions = useCallback(async () => {
     setLoadingRegions(true);
-    setLocalError(null);
     try {
       const response = await axiosInstance.post(
         "/api/v1.0/regions/search",
@@ -143,39 +128,40 @@ export function PersonalDetailsForm({
         { params: { size: 50 } },
       );
       setAllRegions(response.data?.content || []);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      console.error("Failed to fetch regions:", err);
-      setLocalError("Failed to load regions.");
+      toast.error("Failed to fetch regions")
     } finally {
       setLoadingRegions(false);
     }
   }, []);
 
-  const fetchDistricts = React.useCallback(
-    async (regionId: string, type: "birth" | "contact") => {
+  useEffect(() => {
+    if (error){
+      toast.error(error);
+    }
+  }, [error]);
+
+  const fetchDistricts = useCallback(
+    async (regionId: string, type: "contact") => {
       if (!regionId) return;
-      const setLoading =
-        type === "birth"
-          ? setLoadingBirthDistricts
-          : setLoadingContactDistricts;
-      const setOptions =
-        type === "birth" ? setBirthDistrictOptions : setContactDistrictOptions;
+      const setLoading = setLoadingContactDistricts;
+      const setOptions = setContactDistrictOptions;
       setLoading(true);
       setOptions([]);
-      setLocalError(null);
       try {
         const payload = {
-          where: { field: "regionId", operator: "eq", value: Number(regionId) },
+          where: [{ leftHand: {value: "regionId"}, matchMode: "EQUAL", rightHand: {value: Number(regionId)}, operator: "AND" }],
         };
         const response = await axiosInstance.post(
           "/api/v1.0/districts/search",
           payload,
-          { params: { size: 200 } },
+          { params: { size: 261 } },
         );
         setOptions(response.data?.content || []);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
-        console.error(`Failed to fetch ${type} districts:`, err);
-        setLocalError(`Failed to load ${type} districts.`);
+        toast.error(`Failed to fetch ${type} districts`);
       } finally {
         setLoading(false);
       }
@@ -183,23 +169,17 @@ export function PersonalDetailsForm({
     [],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchRegions().then(()=>{});
   }, [fetchRegions]);
 
-  React.useEffect(() => {
-    if (formState.birthRegionId)
-      fetchDistricts(formState.birthRegionId, "birth").then(()=>{});
-    else setBirthDistrictOptions([]);
-  }, [formState.birthRegionId, fetchDistricts]);
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (formState.contactRegionId)
       fetchDistricts(formState.contactRegionId, "contact").then(()=>{});
     else setContactDistrictOptions([]);
   }, [formState.contactRegionId, fetchDistricts]);
 
-  const fetchPhotoPreviewUrl = React.useCallback(async (photoId: number) => {
+  const fetchPhotoPreviewUrl = useCallback(async (photoId: number) => {
     if (!photoId) return;
     setIsFetchingPreview(true);
     try {
@@ -215,7 +195,7 @@ export function PersonalDetailsForm({
     }
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (application?.applicant) {
       const app = application.applicant;
       const contact = app.contactInformation;
@@ -225,12 +205,10 @@ export function PersonalDetailsForm({
             .map((s) => s.trim())
             .filter((s) => s)
         : [];
-      const birthRegionIdStr = app.district?.regionId?.toString() ?? "";
-      const birthDistrictIdStr = app.districtId?.toString() ?? "";
       const contactRegionIdStr = contact?.district?.regionId?.toString() ?? "";
       const contactDistrictIdStr = contact?.districtId?.toString() ?? "";
 
-      setFormState({
+      const loadedState: PersonalDetailsState = {
         firstName: app.firstName || "",
         middleName: app.middleName || "",
         lastName: app.lastName || "",
@@ -241,8 +219,6 @@ export function PersonalDetailsForm({
         birthPlace: app.placeOfBirth || "",
         country: app.country || "",
         nationality: app.nationality || "",
-        birthRegionId: birthRegionIdStr,
-        birthDistrictId: birthDistrictIdStr,
         languagesSpoken: app.languagesSpoken || "",
         selectedConditions: conditions.length > 0 ? conditions : ["none"],
         address: contact?.address || "",
@@ -254,32 +230,35 @@ export function PersonalDetailsForm({
         email: app.email || "",
         parentName: contact?.contactPersonName || "",
         parentContact: contact?.contactPersonPhoneNUmber || "",
-      });
+      };
 
-      if (app.profilePhotoId && !profilePhoto) {
-        fetchPhotoPreviewUrl(app.profilePhotoId);
-      } else if (!app.profilePhotoId) {
+      setFormState(loadedState);
+      setInitialValues(JSON.parse(JSON.stringify(loadedState)));
+
+      setProfilePhoto(null);
+      if (app.profilePhotoId) {
+        fetchPhotoPreviewUrl(app.profilePhotoId).then(()=>{});
+      } else {
         setPhotoPreview(null);
       }
     } else {
       setFormState(initialFormState);
+      setInitialValues(null);
       setPhotoPreview(null);
       setProfilePhoto(null);
     }
-  }, [application, fetchPhotoPreviewUrl, profilePhoto]);
+  }, [application, fetchPhotoPreviewUrl]);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (
-    name: keyof PersonalDetailsState,
+    name: keyof Omit<PersonalDetailsState, "selectedConditions">,
     value: string,
   ) => {
     setFormState((prev) => ({ ...prev, [name]: value }));
-    if (name === "birthRegionId")
-      setFormState((prev) => ({ ...prev, birthDistrictId: "" }));
     if (name === "contactRegionId")
       setFormState((prev) => ({ ...prev, contactDistrictId: "" }));
   };
@@ -308,9 +287,10 @@ export function PersonalDetailsForm({
     });
   };
 
-  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      console.log("Choosing photo")
       setProfilePhoto(file);
       setPhotoPreview(URL.createObjectURL(file));
     } else {
@@ -330,7 +310,7 @@ export function PersonalDetailsForm({
   const clearFile = () => {
     setProfilePhoto(null);
     if (application?.applicant?.profilePhotoId) {
-      fetchPhotoPreviewUrl(application.applicant.profilePhotoId);
+      fetchPhotoPreviewUrl(application.applicant.profilePhotoId).then(()=>{});;
     } else {
       setPhotoPreview(null);
     }
@@ -343,35 +323,54 @@ export function PersonalDetailsForm({
     onBack();
   };
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setError(null);
-    setLocalError(null);
-    if (!applicationId) {
-      setError("Cannot save progress: Application ID not found.");
+    if (!applicationId || !application?.applicant?.id) {
+      toast.error("Application/Applicant ID not found.");
+      return;
+    }
+
+    const isPhotoDirty = profilePhoto !== null;
+    let isFormDirty = false;
+    if (initialValues) {
+      isFormDirty = JSON.stringify(formState) !== JSON.stringify(initialValues);
+    } else {
+      isFormDirty = Object.values(formState).some((value) => {
+        if (Array.isArray(value))
+          return value.length > 0 && (value.length > 1 || value[0] !== "none");
+        return value !== "" && value !== null;
+      });
+    }
+    const isDirty = isPhotoDirty || isFormDirty;
+
+    if (!isDirty) {
+      onNext();
       return;
     }
 
     let profilePhotoIdToSubmit: number | null =
-      application?.applicant?.profilePhotoId ?? null;
+      application.applicant.profilePhotoId ?? null;
 
     if (profilePhoto) {
-      setError("Uploading photo...");
       try {
         const presignResponse = await axiosInstance.post(
           "/api/v1.0/files/upload",
           { name: profilePhoto.name },
         );
         const { id: newPhotoId, signedUrl } = presignResponse.data;
+        console.log(presignResponse.data);
         if (!signedUrl || !newPhotoId)
           throw new Error("Failed to get photo upload destination.");
-        await axios.put(signedUrl, profilePhoto, {
+        const uploadResponse = await fetch(signedUrl, {
+          method: "PUT",
           headers: { "Content-Type": profilePhoto.type },
+          body: profilePhoto,
         });
+        if (!uploadResponse.ok) throw new Error("Failed to upload photo.");
         profilePhotoIdToSubmit = newPhotoId;
         setError(null);
       } catch (uploadError: any) {
-        console.error("Photo upload failed:", uploadError);
         setError(
           `Photo upload failed: ${uploadError.message || "Please try again."}`,
         );
@@ -380,48 +379,48 @@ export function PersonalDetailsForm({
     }
 
     const applicantPayload: ApplicantInput = {
-      firstName: formState.firstName || null,
-      middleName: formState.middleName || null,
-      lastName: formState.lastName || null,
-      phoneNumber: formState.phone || null,
-      email: formState.email || null,
-      gender: formState.gender || null,
-      dateOfBirth: formState.dob ? new Date(formState.dob).getTime() : null,
-      placeOfBirth: formState.birthPlace || null,
-      country: formState.country || null,
-      nationality: formState.nationality || null,
-      districtId: formState.birthDistrictId
-        ? Number(formState.birthDistrictId)
-        : null,
-      languagesSpoken: formState.languagesSpoken || null,
+      firstName: formState.firstName || "",
+      middleName: formState.middleName || "",
+      lastName: formState.lastName || "",
+      phoneNumber: formState.phone || "",
+      email: formState.email || "",
+      gender: formState.gender === "Male" ? "MALE" : "FEMALE",
+      dateOfBirth: formState.dob ? new Date(formState.dob).getTime() : 0,
+      placeOfBirth: formState.birthPlace || "",
+      country: formState.country || "",
+      nationality: formState.nationality || "",
+      languagesSpoken: formState.languagesSpoken || "",
       medicalConditions: formState.selectedConditions.includes("none")
-        ? null
+        ? ""
         : formState.selectedConditions.join(", "),
       profilePhotoId: profilePhotoIdToSubmit,
       contactInformation: {
-        address: formState.address || null,
-        city: formState.city || null,
+        address: formState.address || "",
+        city: formState.city || "",
         districtId: formState.contactDistrictId
           ? Number(formState.contactDistrictId)
           : null,
-        digitalAddress: formState.digitalAddress || null,
-        contactPersonName: formState.parentName || null,
-        contactPersonPhoneNUmber: formState.parentContact || null,
+        digitalAddress: formState.digitalAddress || "",
+        contactPersonName: formState.parentName || "",
+        contactPersonPhoneNUmber: formState.parentContact || "",
+        phoneNumber: formState.phone,
+        email: formState.email,
       },
     };
 
-    const payload: Partial<ApplicationInput> = {
-      applicant: applicantPayload,
-      registrationStage: "PERSONAL_DETAILS",
-    };
-
-    const success = await updateApplication(payload);
+    const succ = await updateApplicantDetails(applicantPayload);
+    if (!succ){
+      toast.error("Could not update applicant details")
+      return;
+    }
+    const success = await updateApplication({registrationStage: mapStageToStepId(application?.registrationStage ?? "PERSONAL_DETAILS") <= mapStageToStepId("PERSONAL_DETAILS")
+          ? "DRAFT"
+          :  application?.registrationStage});
     if (success) {
+      setProfilePhoto(null);
       onNext();
     }
   };
-
-  const displayError = error || localError;
 
   return (
     <Card className="w-full shadow-sm">
@@ -434,14 +433,6 @@ export function PersonalDetailsForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-8">
-          {displayError && (
-            <Alert variant="destructive" className="mb-4">
-              {" "}
-              <AlertTitle>Error</AlertTitle>{" "}
-              <AlertDescription>{displayError}</AlertDescription>{" "}
-            </Alert>
-          )}
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="firstName">
@@ -450,10 +441,11 @@ export function PersonalDetailsForm({
               <Input
                 id="firstName"
                 name="firstName"
+                className="focus:ring-green-500"
                 value={formState.firstName}
                 onChange={handleInputChange}
                 required
-                disabled={isLoading}
+                disabled={true}
               />
             </div>
             <div className="space-y-1.5">
@@ -461,6 +453,7 @@ export function PersonalDetailsForm({
               <Input
                 id="middleName"
                 name="middleName"
+                className="focus:ring-green-500"
                 value={formState.middleName}
                 onChange={handleInputChange}
                 disabled={isLoading}
@@ -473,10 +466,11 @@ export function PersonalDetailsForm({
               <Input
                 id="lastName"
                 name="lastName"
+                className="focus:ring-green-500"
                 value={formState.lastName}
                 onChange={handleInputChange}
                 required
-                disabled={isLoading}
+                disabled={true}
               />
             </div>
             <div className="space-y-1.5">
@@ -490,7 +484,7 @@ export function PersonalDetailsForm({
                 required
                 disabled={isLoading}
               >
-                <SelectTrigger id="gender">
+                <SelectTrigger id="gender" className="w-full focus:ring-green-500">
                   <SelectValue placeholder="Select Gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -513,7 +507,7 @@ export function PersonalDetailsForm({
                 value={formState.dob}
                 onChange={handleInputChange}
                 required
-                className="block w-full"
+                className="block w-full focus:ring-green-500"
                 disabled={isLoading}
               />
             </div>
@@ -524,6 +518,7 @@ export function PersonalDetailsForm({
               <Input
                 id="birthPlace"
                 name="birthPlace"
+                className="focus:ring-green-500"
                 value={formState.birthPlace}
                 onChange={handleInputChange}
                 required
@@ -532,16 +527,28 @@ export function PersonalDetailsForm({
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="country">
-                Country of Birth <span className="text-red-500">*</span>
+                Country <span className="text-red-500">*</span>
               </Label>
-              <Input
-                id="country"
-                name="country"
-                value={formState.country}
-                onChange={handleInputChange}
-                required
-                disabled={isLoading}
-              />
+              <Select
+                  name="country"
+                  value={formState.country}
+                  onValueChange={(value) =>
+                      handleSelectChange("country", value)
+                  }
+                  required
+                  disabled={isLoading}
+              >
+                <SelectTrigger id="country" className="w-full focus:ring-green-500">
+                  <SelectValue placeholder="Select Country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countryOptions.map((o) => (
+                      <SelectItem key={o} value={o}>
+                        {o}
+                      </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="nationality">
@@ -556,7 +563,7 @@ export function PersonalDetailsForm({
                 required
                 disabled={isLoading}
               >
-                <SelectTrigger id="nationality">
+                <SelectTrigger id="nationality" className="w-full focus:ring-green-500">
                   <SelectValue placeholder="Select Nationality" />
                 </SelectTrigger>
                 <SelectContent>
@@ -568,76 +575,6 @@ export function PersonalDetailsForm({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="birthRegionId">
-                Region of Birth <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                name="birthRegionId"
-                value={formState.birthRegionId}
-                onValueChange={(value) =>
-                  handleSelectChange("birthRegionId", value)
-                }
-                required
-                disabled={isLoading || loadingRegions}
-              >
-                <SelectTrigger id="birthRegionId">
-                  <SelectValue placeholder="Select Region" />
-                </SelectTrigger>
-                <SelectContent>
-                  {loadingRegions ? (
-                    <SelectItem value="load" disabled>
-                      Loading...
-                    </SelectItem>
-                  ) : (
-                    allRegions.map((o) => (
-                      <SelectItem key={o.id} value={o.id.toString()}>
-                        {o.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="birthDistrictId">
-                District of Birth <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                name="birthDistrictId"
-                value={formState.birthDistrictId}
-                onValueChange={(value) =>
-                  handleSelectChange("birthDistrictId", value)
-                }
-                required
-                disabled={
-                  isLoading || loadingBirthDistricts || !formState.birthRegionId
-                }
-              >
-                <SelectTrigger id="birthDistrictId">
-                  <SelectValue
-                    placeholder={
-                      !formState.birthRegionId
-                        ? "Select region first"
-                        : "Select District"
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {loadingBirthDistricts ? (
-                    <SelectItem value="load" disabled>
-                      Loading...
-                    </SelectItem>
-                  ) : (
-                    birthDistrictOptions.map((o) => (
-                      <SelectItem key={o.id} value={o.id.toString()}>
-                        {o.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
             <div className="space-y-1.5 md:col-span-2">
               <Label htmlFor="languages">
                 Languages Spoken <span className="text-red-500">*</span>
@@ -645,6 +582,7 @@ export function PersonalDetailsForm({
               <Input
                 id="languages"
                 name="languagesSpoken"
+                className="focus:ring-green-500"
                 value={formState.languagesSpoken}
                 onChange={handleInputChange}
                 required
@@ -659,10 +597,7 @@ export function PersonalDetailsForm({
               Medical Condition / Disability{" "}
               <span className="text-red-500">*</span>
             </Label>
-            <p className="text-sm text-muted-foreground">
-              Please select any conditions that apply. Select `None` if none
-              apply.
-            </p>
+            <p className="text-sm text-muted-foreground">{`Please select any conditions that apply. Select "None" if none apply.`}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3 pt-1">
               {medicalConditions.map((condition) => (
                 <div key={condition.id} className="flex items-center space-x-2">
@@ -703,9 +638,6 @@ export function PersonalDetailsForm({
             <div className="space-y-3">
               <Label className="font-medium text-gray-700">
                 Profile Photo <span className="text-red-500">*</span>{" "}
-                <span className="text-gray-500 text-sm font-normal">
-                  [Max size: 200KB]
-                </span>
               </Label>
               <Input
                 id="profilePhotoInput"
@@ -759,16 +691,17 @@ export function PersonalDetailsForm({
             </div>
             <div className="flex justify-center md:justify-end">
               <Avatar className="h-28 w-28 border">
+                {" "}
                 <AvatarImage
                   src={photoPreview ?? undefined}
                   alt="Photo preview"
-                />
+                />{" "}
                 <AvatarFallback
                   className={cn(isFetchingPreview && "animate-pulse")}
                 >
                   {" "}
                   <UserIcon className="h-12 w-12 text-gray-400" />{" "}
-                </AvatarFallback>
+                </AvatarFallback>{" "}
               </Avatar>
             </div>
           </div>
@@ -787,6 +720,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="address"
                   name="address"
+                  className="focus:ring-green-500"
                   value={formState.address}
                   onChange={handleInputChange}
                   required
@@ -800,6 +734,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="city"
                   name="city"
+                  className="focus:ring-green-500"
                   value={formState.city}
                   onChange={handleInputChange}
                   required
@@ -819,7 +754,7 @@ export function PersonalDetailsForm({
                   required
                   disabled={isLoading || loadingRegions}
                 >
-                  <SelectTrigger id="contactRegionId">
+                  <SelectTrigger id="contactRegionId" className="w-full focus:ring-green-500">
                     <SelectValue placeholder="Select Region" />
                   </SelectTrigger>
                   <SelectContent>
@@ -854,7 +789,7 @@ export function PersonalDetailsForm({
                     !formState.contactRegionId
                   }
                 >
-                  <SelectTrigger id="contactDistrictId">
+                  <SelectTrigger id="contactDistrictId" className="w-full focus:ring-green-500">
                     <SelectValue
                       placeholder={
                         !formState.contactRegionId
@@ -883,6 +818,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="digitalAddress"
                   name="digitalAddress"
+                  className="focus:ring-green-500"
                   value={formState.digitalAddress}
                   onChange={handleInputChange}
                   placeholder="e.g. GA-123-4567"
@@ -897,6 +833,7 @@ export function PersonalDetailsForm({
                   id="phone"
                   name="phone"
                   type="tel"
+                  className="focus:ring-green-500"
                   value={formState.phone}
                   onChange={handleInputChange}
                   required
@@ -910,11 +847,12 @@ export function PersonalDetailsForm({
                 <Input
                   id="email"
                   name="email"
+                  className="focus:ring-green-500"
                   type="email"
                   value={formState.email}
                   onChange={handleInputChange}
                   required
-                  disabled={isLoading}
+                  disabled={true}
                 />
               </div>
             </div>
@@ -934,6 +872,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="parentName"
                   name="parentName"
+                  className="focus:ring-green-500"
                   value={formState.parentName}
                   onChange={handleInputChange}
                   required
@@ -948,6 +887,7 @@ export function PersonalDetailsForm({
                   id="parentContact"
                   name="parentContact"
                   type="tel"
+                  className="focus:ring-green-500"
                   value={formState.parentContact}
                   onChange={handleInputChange}
                   required
