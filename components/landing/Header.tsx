@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 export default function Header() {
   return (
-    <header className="bg-gradient-to-r from-[#0056b3] to-[#003366] text-white py-5 shadow-md">
+    <header className="bg-gradient-to-r from-[#46b3a8] to-[#00a73f] text-white py-5 shadow-md">
       <div className="container flex items-center justify-between">
         <div className="flex items-center">
           <Image 

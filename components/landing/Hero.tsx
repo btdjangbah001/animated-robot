@@ -16,7 +16,7 @@ export default function Hero() {
           backgroundImage: "url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')"
         }}
       >
-        <div className="absolute inset-0 bg-[rgba(0,86,179,0.85)]"></div>
+        <div className="absolute inset-0 bg-[rgba(0,86,17,0.85)]"></div>
         <div className="container relative z-10 max-w-4xl">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Welcome to the Ministry of Health Admission Portal</h2>
           <p className="text-lg mb-8 opacity-95">

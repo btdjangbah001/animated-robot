@@ -124,8 +124,8 @@
 }
 
 :root {
-  --primary: #0056b3;
-  --secondary: #28a745;
+  --primary: #01a740; 
+  --secondary: #a70168;
   --accent: #ffc107;
   --light: #f8f9fa;
   --dark: #343a40;

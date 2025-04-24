@@ -16,7 +16,7 @@ import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { Check } from 'lucide-react';
 
-const GHANA_CARD_REGEX = /^[A-Z]{3}-\d{9}-\d$/;
+const PHONE_REGEX = /^0\d{9}$/;
 
 interface PaymentDialogProps {
   open: boolean;
@@ -34,7 +34,6 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
     ghanaCardNumber: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const setPaymentDetails = useUserStore((state) => state.setPaymentDetails);
 
@@ -48,8 +47,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
     if (!paymentData.firstName) newErrors.fullName = 'First name is required';
     if (!paymentData.lastName) newErrors.lastName = 'Last name is required';
     if (!paymentData.email) newErrors.email = 'Email is required';
-    if (!paymentData.mobileMoneyNumber) newErrors.phone = 'Phone number is required';
-    if (!paymentData.ghanaCardNumber || !GHANA_CARD_REGEX.test(paymentData.ghanaCardNumber)) newErrors.ghanaCard = 'Ghana card number is required';
+    if (!paymentData.mobileMoneyNumber || !PHONE_REGEX.test(paymentData.mobileMoneyNumber)) newErrors.mobileMoneyNumber = 'Please enter a valid mobile money number';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -74,9 +72,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
       );
 
       if (response.data && response.data.invoiceNumber) {
-        setSuccess(true);
         setTimeout(() => {
-          setSuccess(false);
           onClose();
         }, 3000);
         setPaymentDetails({
@@ -103,16 +99,16 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle className="bg-[#0056b3] text-white">
+        <DialogTitle className="bg-[#00a73f] text-white">
           Payment Information
           <p className="text-sm mt-1">Application Fee: GHS{amount}</p>
         </DialogTitle>
         <DialogContent dividers className="space-y-4 pt-4">
-          {success && (
-            <Alert severity="success" className="mb-4">
-              Payment successful! You can now proceed with your registration.
+    
+            <Alert variant="filled" severity="error" className="mb-4">
+              Please complete all NAME fields exactly as they appear on your official certificate. Once you submit your NAME, it cannot be changed. Please ensure your entry exactly matches your certificate before proceeding.
             </Alert>
-          )}
+          
 
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -185,6 +181,9 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   placeholder="Enter your mobile money number"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                 />
+                {errors.mobileMoneyNumber && (
+                  <p className="text-xs text-red-600 mt-1">{errors.mobileMoneyNumber}</p>
+                )}
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label
@@ -197,15 +196,11 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   id="ghanaCardNumber"
                   name="ghanaCardNumber"
                   type="text"
-                  required
                   value={paymentData.ghanaCardNumber}
                   onChange={handleChange}
                   placeholder="e.g., GHA-123456789-0"
 
                 />
-                {errors.ghanaCard && (
-                  <p className="text-xs text-red-600 mt-1">{errors.ghanaCard}</p>
-                )}
               </div>
             </div>
           </div>
@@ -217,7 +212,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
           <Button
             type="submit"
             variant="contained"
-            color="primary"
+            color="success"
             disabled={isLoading}
           >
             {isLoading ? (
