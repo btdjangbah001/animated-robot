@@ -9,7 +9,6 @@ import {ProgramDetailsForm} from "@/components/application/programDetailsForm";
 import {AcademicDetailsForm} from "@/components/application/academicDetailsForm";
 import {PersonalDetailsForm} from "@/components/application/personalDetailsForm";
 import {ApplicationPreview} from "@/components/application/applicationPreview";
-import {QuickActions} from "@/components/application/quickActions";
 import useApplicationStore from "@/store/applicationStore";
 import {toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -49,9 +48,7 @@ export default function ApplicationFormPage() {
   }, [application, isLoading, error, fetchApplication]);
 
   useEffect(() => {
-    console.log("useEffect outer")
     if (!hasInitializedFromStage && application?.registrationStage) {
-      console.log("useEffect inner")
       const targetStep = mapStageToStepId(application.registrationStage);
       const stepToSet =
           targetStep <= applicationSteps.length
@@ -151,7 +148,7 @@ export default function ApplicationFormPage() {
               ) : (
                   renderCurrentStep()
               )}
-              {application && <QuickActions />}
+              {/*{application && <QuickActions />}*/}
             </main>
             <AppFooter />
           </div>

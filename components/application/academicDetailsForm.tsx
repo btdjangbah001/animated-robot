@@ -13,6 +13,7 @@ import {ApplicationInput, CoreResultInput, ElectiveResultInput,} from "@/types/a
 import {SubjectOutput} from "@/types/applicant";
 import {toast} from "react-toastify";
 import {mapStageToStepId} from "@/lib/consts";
+import {areCoreResultsEqual, areElectivesResultsEqual} from "@/lib/utils";
 
 interface ElectiveSubjectLocal {
   id: string;
@@ -250,6 +251,19 @@ export function AcademicDetailsForm({
       return;
     }
 
+    const indexNumbers = new Set();
+    electiveSubjects.forEach((subject) => {
+      indexNumbers.add(subject.indexNumber)
+    })
+    coreSubjects.forEach((subject) => {
+      indexNumbers.add(subject.indexNumber)
+    })
+
+    if (indexNumbers.size > 3){
+      toast.error(`You can not use grades from more than 3 certificates. But your form shows ${indexNumbers.size} different index numbers.`)
+      return;
+    }
+
     const mappedElectiveResults: ElectiveResultInput[] = electiveSubjects
       .filter(
         (s) =>
@@ -278,6 +292,15 @@ export function AcademicDetailsForm({
         year: Number(s.examYear),
         month: s.examMonth,
       }));
+
+    const examsTypeIsDirty = applicationType != application?.examinationType;
+    if (!examsTypeIsDirty
+        && areCoreResultsEqual(mappedCoreResults, application?.coreResults ?? [])
+        && areElectivesResultsEqual(mappedElectiveResults, application?.electiveResults ?? [])
+    ){
+      onNext();
+      return;
+    }
 
     const electivesComplete = electiveSubjects.every(
       (s) =>

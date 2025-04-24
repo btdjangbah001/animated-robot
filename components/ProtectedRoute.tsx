@@ -23,7 +23,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
           router.push("/portal/login");
         }
       } catch (error) {
-        console.log(error);
         router.push("/portal/login");
       } finally {
         setIsLoading(false);

@@ -88,7 +88,7 @@ export interface CoreResultOutput {
     indexNumber: string | null;
     year: number | null;
     month: string | null;
-    subject?: SubjectOutput | null; // Added nested subject based on assumption
+    subject?: SubjectOutput | null;
 }
 
 export interface ElectiveResultOutput {

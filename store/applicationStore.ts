@@ -102,7 +102,6 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
             set({ isLoading: false });
             return true;
         } catch (error) {
-            console.error("Failed to update application:", error);
             let message = "Failed to save application progress.";
             if (error instanceof AxiosError && error.response?.data?.message) {
                 message = error.response.data.message;
@@ -122,7 +121,6 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
             set({ isLoading: false });
             return true;
         } catch (error) {
-            console.error("Failed to update applicant details:", error);
             let message = "Failed to save personal details.";
             if (error instanceof AxiosError && error.response?.data?.message) { message = error.response.data.message; }
             set({ isLoading: false, error: message });
@@ -136,7 +134,6 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
             const response = await axiosInstance.post('/api/v1.0/program-types/search', {}, { params: { size: 100 } });
             set({ programTypes: response.data?.content || [], isLoadingProgramTypes: false });
         } catch (error) {
-            console.error("Failed to fetch program types:", error);
             set({ isLoadingProgramTypes: false, dropdownError: "Failed to load program types." });
         }
     },
@@ -148,7 +145,6 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
             const response = await axiosInstance.get(`/api/v1.0/institutions/by-program-type/${Number(programTypeId)}`);
             set({ institutions: response.data || [], isLoadingInstitutions: false });
         } catch (error) {
-            console.error("Failed to fetch institutions:", error);
             set({ isLoadingInstitutions: false, dropdownError: "Failed to load institutions." });
         }
     },
@@ -160,7 +156,6 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
             const response = await axiosInstance.get(`/api/v1.0/programs/by-program-type/${Number(programTypeId)}/institution/${Number(institutionId)}`);
             set({ programs: response.data || [], isLoadingPrograms: false });
         } catch (error) {
-            console.error("Failed to fetch programs:", error);
             set({ isLoadingPrograms: false, dropdownError: "Failed to load programs." });
         }
     },
