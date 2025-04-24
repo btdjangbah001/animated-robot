@@ -187,8 +187,8 @@ export function PersonalDetailsForm({
         `/api/v1.0/files/download/${photoId}`,
       );
       setPhotoPreview(response.data?.signedUrl || null);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (fetchError) {
-      console.error("Failed to fetch photo preview URL:", fetchError);
       setPhotoPreview(null);
     } finally {
       setIsFetchingPreview(false);
@@ -290,7 +290,6 @@ export function PersonalDetailsForm({
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      console.log("Choosing photo")
       setProfilePhoto(file);
       setPhotoPreview(URL.createObjectURL(file));
     } else {
@@ -310,7 +309,7 @@ export function PersonalDetailsForm({
   const clearFile = () => {
     setProfilePhoto(null);
     if (application?.applicant?.profilePhotoId) {
-      fetchPhotoPreviewUrl(application.applicant.profilePhotoId).then(()=>{});;
+      fetchPhotoPreviewUrl(application.applicant.profilePhotoId).then(()=>{});
     } else {
       setPhotoPreview(null);
     }
@@ -359,7 +358,6 @@ export function PersonalDetailsForm({
           { name: profilePhoto.name },
         );
         const { id: newPhotoId, signedUrl } = presignResponse.data;
-        console.log(presignResponse.data);
         if (!signedUrl || !newPhotoId)
           throw new Error("Failed to get photo upload destination.");
         const uploadResponse = await fetch(signedUrl, {

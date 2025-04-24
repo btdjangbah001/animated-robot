@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {Download, GraduationCap, LogOut, Printer, User,} from "lucide-react";
+import {Download, GraduationCap, LogOut, User,} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar";
 import {
@@ -24,7 +24,6 @@ const navItems = [
     icon: Download,
     activeSlug: "/downloads",
   },
-  { href: "/print", label: "Print Form", icon: Printer, activeSlug: "/print" },
 ];
 
 export function AppHeader() {
@@ -34,7 +33,7 @@ export function AppHeader() {
   const logout = useAuthStore(state => state.logout);
 
   useEffect(() => {
-    if (!application) fetchApplication(applicationId ?? null).then(()=>{})
+    if (!application) fetchApplication().then(()=>{})
   }, [application, applicationId, fetchApplication]);
 
   const currentPath = "/application/form";
@@ -91,16 +90,7 @@ export function AppHeader() {
                   asChild
                   className={cn(isActive && "bg-green-50")}
                 >
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      "flex items-center gap-2 cursor-pointer",
-                      isActive ? "text-green-700 font-medium" : "text-gray-700",
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
                     <span>{item.label}</span>
-                  </Link>
                 </DropdownMenuItem>
               );
             })}

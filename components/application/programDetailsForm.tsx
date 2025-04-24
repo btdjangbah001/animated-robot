@@ -93,9 +93,6 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
         institutionId: initialInstitutionId,
         programId: initialProgramId,
       });
-
-      console.log(application);
-      console.log(initialValues);
     }
   }, [application]);
 
@@ -156,9 +153,6 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
       selectedProgramId !== initialValues?.programId;
 
     if (!isDirty) {
-      console.log(
-        "No changes detected in Program Details, proceeding to next step.",
-      );
       onNext();
       return;
     }
