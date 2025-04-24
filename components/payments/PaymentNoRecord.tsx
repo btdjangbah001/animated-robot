@@ -14,12 +14,12 @@ const PaymentNoRecord: React.FC<PaymentNoRecordProps> = ({
         <h1 style={{ ...styles.title, color: '#17a2b8' }}>Transaction Not Found</h1>
         
         <p style={styles.text}>
-          We couldn't locate your payment record. This usually means:
+          {`We couldn't locate your payment record. This usually means:`}
         </p>
         
         <div style={styles.detailsBox}>
           <ul style={styles.list}>
-            <li>The payment wasn't completed</li>
+            <li>{`The payment wasn't completed`}</li>
             <li>You used a different email/phone</li>
             <li>System delay (try again in 30 minutes)</li>
           </ul>
@@ -30,7 +30,7 @@ const PaymentNoRecord: React.FC<PaymentNoRecordProps> = ({
         </div>
 
         <div style={styles.footer}>
-          If you're certain you paid, contact support with your proof of payment.<br />
+          {`If you're certain you paid, contact support with your proof of payment.`}<br />
           {/* Email <a href={`mailto:${supportEmail}`} style={styles.link}>{supportEmail}</a> or call {supportPhone} */}
         </div>
       </div>

@@ -11,8 +11,6 @@ const PaymentSuccess: React.FC<PaymentSuccessProps> = ({
   serialNumber,
   onContinue = () => window.location.href = '/dashboard' // Default redirect
 }) => {
-  const currentYear = new Date().getFullYear();
-
   return (
     <div style={{
       fontFamily: "'Arial', sans-serif",
@@ -91,7 +89,7 @@ const PaymentSuccess: React.FC<PaymentSuccessProps> = ({
         </div>
 
         <p style={{ fontStyle: 'italic', color: '#555', marginTop: '15px' }}>
-          Please keep this information secure, as it will be required for future access or transactions. If you don't receive the details via email/SMS, check your spam folder or contact support.
+          {`Please keep this information secure, as it will be required for future access or transactions. If you don't receive the details via email/SMS, check your spam folder or contact support.`}
         </p>
         
         <div style={{ textAlign: 'center', marginTop: '20px', fontSize: '14px', color: '#777' }}>

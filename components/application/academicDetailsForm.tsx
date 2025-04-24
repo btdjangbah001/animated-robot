@@ -189,7 +189,7 @@ export function AcademicDetailsForm({
         `/api/v1.0/subjects/electives-by-course/${courseId}`,
       );
       const subjectOptions: SubjectOutput[] =
-        response.data?.map((s: any) => ({
+        response.data?.map((s: { id: number; name: string; core: boolean }) => ({
           id: s.id,
           name: s.name,
           core: s.core,

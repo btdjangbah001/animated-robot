@@ -18,14 +18,14 @@ const PaymentPending: React.FC<PaymentPendingProps> = ({ invoice }) => {
         <div style={styles.detailsBox}>
           <p>What to expect:</p>
           <ul style={styles.list}>
-            <li>You'll receive confirmation via email</li>
+            <li>{`You'll receive confirmation via email`}</li>
             <li>No additional action is required</li>
             <li>Refresh this page for updates</li>
           </ul>
         </div>
 
         <div style={styles.footer}>
-          Status will update automatically. Check your spam folder if you don't see updates.
+          {`Status will update automatically. Check your spam folder if you don't see updates.`}
         </div>
       </div>
     </div>

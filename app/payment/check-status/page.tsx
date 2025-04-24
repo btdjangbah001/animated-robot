@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/store/applicantStore";
 import axiosInstance from "@/lib/axios";
@@ -18,7 +18,7 @@ export default function CheckStatusPage() {
   const router = useRouter();
   const invoiceNumber = useUserStore((state) => state.invoiceNumber);
 
-  const checkPaymentStatus = async () => {
+  const checkPaymentStatus = useCallback(async () => {
     if (!invoiceNumber) {
       setStatus("NO_RECORD");
       setIsLoading(false);
@@ -36,17 +36,18 @@ export default function CheckStatusPage() {
       setStatus(paymentStatus?.toString() || "NO_RECORD");
       setApplicant(response.data);
       setIsLoading(false);
-    } catch (error: any) {
+    } catch (err) {
+      console.error("Error fetching payment status:", err);
       setStatus("NO_RECORD");
       setApplicant(null);
       setIsLoading(false);
     }
-  };
+  }, [invoiceNumber]);
 
   useEffect(() => {
     checkPaymentStatus();
-    return () => {};
-  }, [invoiceNumber, router]);
+    return () => { };
+  }, [checkPaymentStatus, router]);
 
   const handleOkClick = () => {
     router.push("/portal/login");
@@ -56,9 +57,9 @@ export default function CheckStatusPage() {
     checkPaymentStatus();
   };
 
-  const statusTemplate  = (status: string) => {
+  const statusTemplate = (status: string) => {
     if (status === "PAID") {
-      return <PaymentSuccess pin={applicant?.pin?? ''} serialNumber={applicant?.serialNumber ?? ''} onContinue={handleOkClick} />;
+      return <PaymentSuccess pin={applicant?.pin ?? ''} serialNumber={applicant?.serialNumber ?? ''} onContinue={handleOkClick} />;
     }
     if (status === "FAILED") {
       return <PaymentFailed errorMessage={'Payment could not be processed'} onRetry={handleTryAgainClick} />;

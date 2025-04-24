@@ -119,7 +119,7 @@ export function PersonalDetailsForm({
   const error = useApplicationStore((state) => state.error);
   const setError = useApplicationStore((state) => state.setError);
 
-  const fetchRegions = useCallback(async () => {
+  const fetchRegions = useCallback(async () => { 
     setLoadingRegions(true);
     try {
       const response = await axiosInstance.post(
@@ -368,9 +368,9 @@ export function PersonalDetailsForm({
         if (!uploadResponse.ok) throw new Error("Failed to upload photo.");
         profilePhotoIdToSubmit = newPhotoId;
         setError(null);
-      } catch (uploadError: any) {
+      } catch (uploadError) {
         setError(
-          `Photo upload failed: ${uploadError.message || "Please try again."}`,
+          `Photo upload failed: ${uploadError || "Please try again."}`,
         );
         return;
       }

@@ -23,6 +23,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
           router.push("/portal/login");
         }
       } catch (error) {
+        console.log("Error verifying auth:", error);
         router.push("/portal/login");
       } finally {
         setIsLoading(false);

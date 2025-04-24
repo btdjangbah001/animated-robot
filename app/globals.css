@@ -1,3 +1,5 @@
+/* src/app/globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -118,5 +120,127 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+:root {
+  --primary: #0056b3;
+  --secondary: #28a745;
+  --accent: #ffc107;
+  --light: #f8f9fa;
+  --dark: #343a40;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f5f7fa;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.price-tag {
+  background-color: white;
+  color: var(--primary);
+  display: inline-block;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 20px 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn {
+  display: inline-block;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  text-align: center;
+  min-width: 220px;
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: var(--dark);
+}
+
+.btn-primary:hover {
+  background-color: #e0a800;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.btn-secondary {
+  background-color: white;
+  color: var(--primary);
+  border: 2px solid white;
+}
+
+.btn-secondary:hover {
+  background-color: transparent;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.section-title h3 {
+  font-size: 32px;
+  color: var(--primary);
+  margin-bottom: 15px;
+}
+
+.section-title p {
+  color: #666;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  background-color: var(--light);
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+  font-size: 48px;
+  color: var(--primary);
+  margin-bottom: 20px;
+}
+
+.feature-card h4 {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: var(--dark);
+}
+
+.copyright {
+  opacity: 0.7;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .price-tag {
+    font-size: 20px;
+    padding: 12px 25px;
   }
 }
