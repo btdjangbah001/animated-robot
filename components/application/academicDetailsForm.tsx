@@ -66,7 +66,6 @@ export function AcademicDetailsForm({
     (state) => state.updateApplication,
   );
   const isLoading = useApplicationStore((state) => state.isLoading);
-  const setError = useApplicationStore((state) => state.setError);
   const waecCourses = useApplicationStore((state) => state.waecCourses);
   const isLoadingWaecCourses = useApplicationStore(
     (state) => state.isLoadingWaecCourses,
@@ -83,6 +82,7 @@ export function AcademicDetailsForm({
   const fetchCoreSubjects = useApplicationStore(
     (state) => state.fetchCoreSubjects,
   );
+  const disable = application?.registrationStage === "SUBMITTED";
 
   useEffect(() => {
     if (waecCourses.length === 0) fetchWaecCourses().then(() => {});
@@ -214,6 +214,10 @@ export function AcademicDetailsForm({
   };
 
   const addSubjectRow = () => {
+    if (electiveSubjects.length === 4) {
+      toast.info("You can only add a maximum of 4 elective subjects.")
+      return;
+    }
     setElectiveSubjects((prev) => [
       ...prev,
       {
@@ -245,9 +249,18 @@ export function AcademicDetailsForm({
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    setError(null);
+    if (disable){
+      onNext();
+      return;
+    }
+
+    if (disable){
+      onNext();
+      return;
+    }
+
     if (!applicationId) {
-      setError("Application ID not found.");
+      toast.error("Application ID not found.");
       return;
     }
 
@@ -357,7 +370,7 @@ export function AcademicDetailsForm({
               value={applicationType}
               onValueChange={setApplicationType}
               required
-              disabled={isLoading}
+              disabled={isLoading || disable}
             >
               <SelectTrigger id="application-type" className="w-full focus:ring-green-500">
                 <SelectValue placeholder="Select application type" />
@@ -412,7 +425,7 @@ export function AcademicDetailsForm({
                         onValueChange={(value) =>
                           handleWaecCourseChange(subject.id, value)
                         }
-                        disabled={isLoadingWaecCourses || isLoading}
+                        disabled={(isLoadingWaecCourses || isLoading) || disable}
                       >
                         <SelectTrigger
                           id={`waecCourse-${subject.id}`}
@@ -438,7 +451,6 @@ export function AcademicDetailsForm({
                         </SelectContent>
                       </Select>
                     </div>
-                    {/* Subject - lg:col-span-1 implied */}
                     <div className="space-y-1.5">
                       <Label
                         htmlFor={`subject-${subject.id}`}
@@ -458,7 +470,8 @@ export function AcademicDetailsForm({
                         disabled={
                           !subject.waecCourseId ||
                           subject.loadingSubjects ||
-                          isLoading
+                          isLoading ||
+                          disable
                         }
                       >
                         <SelectTrigger
@@ -491,7 +504,6 @@ export function AcademicDetailsForm({
                         </SelectContent>
                       </Select>
                     </div>
-                    {/* Grade - lg:col-span-1 implied */}
                     <div className="space-y-1.5">
                       <Label
                         htmlFor={`grade-${subject.id}`}
@@ -508,7 +520,7 @@ export function AcademicDetailsForm({
                             value,
                           )
                         }
-                        disabled={isLoading}
+                        disabled={isLoading || disable}
                       >
                         <SelectTrigger
                           id={`grade-${subject.id}`}
@@ -525,7 +537,6 @@ export function AcademicDetailsForm({
                         </SelectContent>
                       </Select>
                     </div>
-                    {/* Index Number - lg:col-span-1 implied */}
                     <div className="space-y-1.5">
                       <Label
                         htmlFor={`indexNumber-${subject.id}`}
@@ -545,11 +556,10 @@ export function AcademicDetailsForm({
                             e.target.value,
                           )
                         }
-                        disabled={isLoading}
+                        disabled={isLoading || disable}
                         className="w-full focus:ring-green-500"
                       />
                     </div>
-                    {/* Exam Date - Spans 2 cols on small, takes 1.5fr space on lg */}
                     <div className="space-y-1.5 col-span-2 lg:col-span-1">
                       <Label className="text-sm font-medium text-gray-600 lg:hidden">
                         Exam Date <span className="text-red-500">*</span>
@@ -564,7 +574,7 @@ export function AcademicDetailsForm({
                               value,
                             )
                           }
-                          disabled={isLoading}
+                          disabled={isLoading || disable}
                         >
                           <SelectTrigger
                             aria-label="Exam Year"
@@ -589,7 +599,7 @@ export function AcademicDetailsForm({
                               value,
                             )
                           }
-                          disabled={isLoading}
+                          disabled={isLoading || disable}
                         >
                           <SelectTrigger
                             aria-label="Exam Month"
@@ -607,7 +617,6 @@ export function AcademicDetailsForm({
                         </Select>
                       </div>
                     </div>
-                    {/* Remove Button - Spans 2 cols on small, takes auto space on lg */}
                     <div className="flex justify-end items-end col-span-2 lg:col-span-1">
                       {electiveSubjects.length > 1 && (
                         <Button
@@ -617,7 +626,7 @@ export function AcademicDetailsForm({
                           className="text-red-500 hover:bg-red-50 hover:text-red-600 h-9 w-9"
                           onClick={() => removeSubjectRow(subject.id)}
                           aria-label="Remove subject row"
-                          disabled={isLoading}
+                          disabled={isLoading || disable}
                         >
                           {" "}
                           <Trash2 className="h-4 w-4" />{" "}
@@ -637,7 +646,7 @@ export function AcademicDetailsForm({
                 variant="outline"
                 className="text-green-700 border-green-300 bg-green-50 hover:bg-green-100 hover:text-green-800 hover:border-green-400"
                 onClick={addSubjectRow}
-                disabled={isLoading}
+                disabled={isLoading || disable}
               >
                 {" "}
                 <PlusCircle className="mr-2 h-4 w-4" /> Add Elective
@@ -648,7 +657,6 @@ export function AcademicDetailsForm({
 
           <Separator />
 
-          {/* --- Core Subjects Section --- */}
           <div className="space-y-6">
             <div>
               <h4 className="text-base font-semibold text-gray-700 mb-1">
@@ -677,7 +685,6 @@ export function AcademicDetailsForm({
                   key={subject.id}
                   className="border-b border-gray-200 pb-5 last:border-b-0 last:pb-0"
                 >
-                  {/* Grid for Inputs: 2 cols default, 4 cols lg */}
                   <div className="grid grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.5fr] gap-4 items-stretch">
                     <div className="space-y-1.5 col-span-2 lg:col-span-1">
                       {" "}
@@ -701,7 +708,7 @@ export function AcademicDetailsForm({
                         onValueChange={(value) =>
                           handleCoreSubjectChange(subject.id, "grade", value)
                         }
-                        disabled={isLoading}
+                        disabled={isLoading || disable}
                       >
                         <SelectTrigger
                           id={`core-grade-${subject.id}`}
@@ -738,7 +745,7 @@ export function AcademicDetailsForm({
                             e.target.value,
                           )
                         }
-                        disabled={isLoading}
+                        disabled={isLoading || disable}
                         className="w-full focus:ring-green-500"
                       />{" "}
                     </div>
@@ -758,7 +765,7 @@ export function AcademicDetailsForm({
                               value,
                             )
                           }
-                          disabled={isLoading}
+                          disabled={isLoading || disable}
                         >
                           <SelectTrigger
                             aria-label="Core Exam Year"
@@ -783,7 +790,7 @@ export function AcademicDetailsForm({
                               value,
                             )
                           }
-                          disabled={isLoading}
+                          disabled={isLoading || disable}
                         >
                           <SelectTrigger
                             aria-label="Core Exam Month"

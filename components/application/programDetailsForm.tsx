@@ -8,6 +8,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/
 import useApplicationStore from "@/store/applicationStore";
 import {ApplicationInput} from "@/types/application";
 import {mapStageToStepId} from "@/lib/consts";
+import {toast} from "react-toastify";
 
 interface ProgramDetailsFormProps {
   onNext: () => void;
@@ -29,6 +30,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
   const [selectedProgramId, setSelectedProgramId] = useState<string>(application?.programId?.toString() ?? "");
   const [initialValues, setInitialValues] =
     useState<InitialProgramDetails | null>(null);
+  const disable = application?.registrationStage === "SUBMITTED";
 
   const applicationId = useApplicationStore((state) => state.applicationId);
   const updateApplication = useApplicationStore(
@@ -36,7 +38,6 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
   );
   const isLoading = useApplicationStore((state) => state.isLoading);
   const error = useApplicationStore((state) => state.error);
-  const setError = useApplicationStore((state) => state.setError);
   const programTypes = useApplicationStore((state) => state.programTypes);
   const institutions = useApplicationStore((state) => state.institutions);
   const programs = useApplicationStore((state) => state.programs);
@@ -132,18 +133,22 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    setError(null);
+
+    if (disable){
+      onNext();
+      return;
+    }
 
     if (
       !selectedProgramTypeId ||
       !selectedInstitutionId ||
       !selectedProgramId
     ) {
-      setError("Please complete all program selections.");
+      toast.error("Please complete all program selections.");
       return;
     }
     if (!applicationId) {
-      setError("Cannot save progress: Application ID not found.");
+      toast.error("Cannot save progress: Application ID not found.");
       return;
     }
 
@@ -196,7 +201,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
                 value={selectedProgramTypeId}
                 onValueChange={handleProgramTypeChange}
                 required
-                disabled={isLoadingProgramTypes || isLoading}
+                disabled={(isLoadingProgramTypes || isLoading) || disable}
               >
                 <SelectTrigger
                   id="program-type"
@@ -229,7 +234,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
                 onValueChange={handleInstitutionChange}
                 required
                 disabled={
-                  !selectedProgramTypeId || isLoadingInstitutions || isLoading
+                  (!selectedProgramTypeId || isLoadingInstitutions || isLoading) || disable
                 }
               >
                 <SelectTrigger
@@ -269,7 +274,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
                 onValueChange={setSelectedProgramId}
                 required
                 disabled={
-                  !selectedInstitutionId || isLoadingPrograms || isLoading
+                  (!selectedInstitutionId || isLoadingPrograms || isLoading) || disable
                 }
               >
                 <SelectTrigger

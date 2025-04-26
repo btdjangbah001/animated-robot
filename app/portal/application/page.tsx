@@ -92,7 +92,6 @@ export default function ApplicationFormPage() {
     }
     const success = await updateApplication({
       registrationStage: "SUBMITTED",
-      submissionDate: new Date().getTime(),
     });
     if (success) {
       toast.success("Application Submitted Successfully!");
@@ -120,6 +119,7 @@ export default function ApplicationFormPage() {
       case 4:
         return (
             <ApplicationPreview
+                isPdfMode={false}
                 onBack={handlePreviousStep}
                 onSubmit={handleFinalSubmit}
                 onEdit={handleEditStep}
@@ -148,7 +148,7 @@ export default function ApplicationFormPage() {
               ) : (
                   renderCurrentStep()
               )}
-              {/*{application && <QuickActions />}*/}
+             {/* {application && <QuickActions />}*/}
             </main>
             <AppFooter />
           </div>

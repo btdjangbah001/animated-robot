@@ -12,6 +12,8 @@ const nonAuthEndpoints: string[] = [
     '/api/v1.0/auth/resend-email-verification-request',
     '/api/v1.0/public/make-payment',
     '/api/v1.0/public/check-status',
+    '/api/v1.0/portal/login',
+    '/api/v1.0/dashboard'
 ];
 
 const axiosInstance = axios.create({
@@ -48,7 +50,7 @@ axiosInstance.interceptors.response.use(
         }
 
         const isNonAuthEndpoint = nonAuthEndpoints.some(endpoint => originalRequest.url?.includes(endpoint));
-        if ((error.response.status === 401 || error.response.status === 403) && !isNonAuthEndpoint && !originalRequest._retry) {
+        if ((error.response.status === 401) && !isNonAuthEndpoint && !originalRequest._retry) {
 
             originalRequest._retry = true;
             const refreshToken = Cookie.get("refreshToken");
@@ -66,7 +68,7 @@ axiosInstance.interceptors.response.use(
                 // Since no refresh endpoint, treat as failure:
                 clearAuthTokens();
                 if (typeof window !== 'undefined') {
-                    window.location.href = '/portal/login';
+                    //window.location.href = '/portal/login';
                 }
                 return Promise.reject(error);
 

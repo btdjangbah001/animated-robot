@@ -54,7 +54,6 @@ export interface ApplicationInput {
     | "PERSONAL_DETAILS"
     | "DRAFT"
     | "SUBMITTED"
-  submissionDate?: number | null; // Timestamp
   applicant?: ApplicantInput | null;
   electiveResults?: ElectiveResultInput[] | null;
   coreResults?: CoreResultInput[] | null;
