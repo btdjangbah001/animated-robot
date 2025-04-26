@@ -114,27 +114,10 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label
-                  htmlFor="firstName"
-                  className="text-sm font-medium text-gray-700"
-                >
-                  First Name
-                </Label>
-                <Input
-                  id="firstName"
-                  name="firstName"
-                  value={paymentData.firstName}
-                  onChange={handleChange}
-                  placeholder="Enter your first name"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label
                   htmlFor="lastName"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Last Name
+                  Surname
                 </Label>
                 <Input
                   id="lastName"
@@ -146,6 +129,24 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                 />
               </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="firstName"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  Other Names
+                </Label>
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  value={paymentData.firstName}
+                  onChange={handleChange}
+                  placeholder="Enter your given names"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                />
+              </div>
+              
               <div className="space-y-2">
                 <Label
                   htmlFor="email"

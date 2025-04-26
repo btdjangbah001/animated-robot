@@ -116,7 +116,7 @@ export interface ApplicationOutput {
     electiveResults: ElectiveResultOutput[] | null;
     coreResults: CoreResultOutput[] | null;
     applicationPin?: string | null;
-    applicationStatus?: string | null;
+    status: "PENDING" | "APPROVED" | "REJECTED" | "IN_REVIEW" | "NEW" | null;
     aggregateGrade?: number | string | null;
 }
 

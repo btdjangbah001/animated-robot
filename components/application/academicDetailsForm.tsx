@@ -14,6 +14,7 @@ import {SubjectOutput} from "@/types/applicant";
 import {toast} from "react-toastify";
 import {mapStageToStepId} from "@/lib/consts";
 import {areCoreResultsEqual, areElectivesResultsEqual} from "@/lib/utils";
+import { count } from "console";
 
 interface ElectiveSubjectLocal {
   id: string;
@@ -42,8 +43,10 @@ interface AcademicDetailsFormProps {
   onBack: () => void;
 }
 
-const wassceGradeOptions = ["A1", "B2", "B3", "C4", "C5", "C6", "D7", "D8"];
+const wassceGradeOptions = ["A1", "B2", "B3", "C4", "C5", "C6", "D7", "E8", "F9"];
+const wassceGradeOptions0 = [{ id: "A1", count: 1 }, { id: "B2", count: 2 }, { id: "B3", count: 3 }, { id: "C4", count: 4 }, { id: "C5", count: 5 }, { id: "C6", count: 6 }, { id: "D7", count: 7 }, { id: "E8", count: 8 }, { id: "F9", count: 9 }];
 const ssceGradeOptions = ["A","B","C","D","E","F"];
+const ssceGradeOptions0 = [{ id: "A", count: 1 }, { id: "B", count: 2 }, { id: "C", count: 3 }, { id: "D", count: 4 }, { id: "E", count: 5 }, { id: "F", count: 6 }];
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: 20 }, (_, i) =>
   (currentYear - i).toString(),
@@ -640,7 +643,7 @@ export function AcademicDetailsForm({
                 </div>
               ))}
             </div>
-            <div className="pt-2">
+            {electiveSubjects.length < 3 && <div className="pt-2">
               <Button
                 type="button"
                 variant="outline"
@@ -652,7 +655,7 @@ export function AcademicDetailsForm({
                 <PlusCircle className="mr-2 h-4 w-4" /> Add Elective
                 Subject{" "}
               </Button>
-            </div>
+            </div>}
           </div>
 
           <Separator />

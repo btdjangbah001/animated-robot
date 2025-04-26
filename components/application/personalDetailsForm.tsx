@@ -26,7 +26,6 @@ interface PersonalDetailsFormProps {
 
 interface PersonalDetailsState {
   firstName: string;
-  middleName: string;
   lastName: string;
   gender: string;
   dob: string;
@@ -44,6 +43,7 @@ interface PersonalDetailsState {
   email: string;
   parentName: string;
   parentContact: string;
+  ghanaCardNumber: string;
 }
 
 const genderOptions: ("MALE" | "FEMALE")[] = ["MALE", "FEMALE"];
@@ -63,7 +63,6 @@ const medicalConditions = [
 
 const initialFormState: PersonalDetailsState = {
   firstName: "",
-  middleName: "",
   lastName: "",
   gender: "",
   dob: "",
@@ -81,6 +80,7 @@ const initialFormState: PersonalDetailsState = {
   email: "",
   parentName: "",
   parentContact: "",
+  ghanaCardNumber: "",
 };
 
 const TARGET_ASPECT_RATIO = 35 / 45;
@@ -214,7 +214,6 @@ export function PersonalDetailsForm({
 
       const loadedState: PersonalDetailsState = {
         firstName: app.firstName || "",
-        middleName: app.middleName || "",
         lastName: app.lastName || "",
         gender: app.gender || "",
         dob: app.dateOfBirth
@@ -234,6 +233,7 @@ export function PersonalDetailsForm({
         email: app.email || "",
         parentName: contact?.contactPersonName || "",
         parentContact: contact?.contactPersonPhoneNUmber || "",
+        ghanaCardNumber: app.ghanaCardNumber || "",
       };
 
       setFormState(loadedState);
@@ -420,7 +420,6 @@ export function PersonalDetailsForm({
 
     const applicantPayload: ApplicantInput = {
       firstName: formState.firstName || "",
-      middleName: formState.middleName || "",
       lastName: formState.lastName || "",
       phoneNumber: formState.phone || "",
       email: formState.email || "",
@@ -434,6 +433,7 @@ export function PersonalDetailsForm({
         ? ""
         : formState.selectedConditions.join(", "),
       profilePhotoId: profilePhotoIdToSubmit,
+      ghanaCardNumber: formState.ghanaCardNumber,
       contactInformation: {
         address: formState.address || "",
         city: formState.city || "",
@@ -476,7 +476,7 @@ export function PersonalDetailsForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="firstName">
-                First Name <span className="text-red-500">*</span>
+                Given Names <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="firstName"
@@ -489,19 +489,8 @@ export function PersonalDetailsForm({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="middleName">Middle Name</Label>
-              <Input
-                id="middleName"
-                name="middleName"
-                className="focus:ring-green-500"
-                value={formState.middleName}
-                onChange={handleInputChange}
-                disabled={isLoading || disable}
-              />
-            </div>
-            <div className="space-y-1.5">
               <Label htmlFor="lastName">
-                Last Name <span className="text-red-500">*</span>
+                Surame <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="lastName"
@@ -511,6 +500,17 @@ export function PersonalDetailsForm({
                 onChange={handleInputChange}
                 required
                 disabled={true}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ghanaCardNumber">Ghana Card Number</Label>
+              <Input
+                id="ghanaCardNumber"
+                name="ghanaCardNumber"
+                className="focus:ring-green-500"
+                value={formState.ghanaCardNumber}
+                onChange={handleInputChange}
+                disabled={isLoading || disable}
               />
             </div>
             <div className="space-y-1.5">

@@ -104,6 +104,53 @@ export function ApplicationPreview({
     ? format(new Date(application.applicant.dateOfBirth), "do MMMM, yyyy")
     : "-";
 
+  const calculateGrade = (examType: string | undefined) => {
+    if (examType) {
+     const corepoints = application?.coreResults?.reduce((acc, result) => {
+        const grade = result.grade;
+        if (grade === "A1") return acc + 1;
+        if (grade === "B2") return acc + 2;
+        if (grade === "B3") return acc + 3;
+        if (grade === "C4") return acc + 4;
+        if (grade === "C5") return acc + 5;
+        if (grade === "C6") return acc + 6;
+        if (grade === "D7") return acc + 7;
+        if (grade === "E8") return acc + 8;
+        if (grade === "F9") return acc + 9;
+        if (grade === "A") return acc + 1;
+        if (grade === "B") return acc + 2;
+        if (grade === "C") return acc + 3;
+        if (grade === "D") return acc + 4;
+        if (grade === "E") return acc + 5;
+        if (grade === "F") return acc + 6;
+        return acc;
+      }, 0);
+      const electivepoints = application?.electiveResults?.reduce((acc, result) => {
+        const grade = result.grade;
+        if (grade === "A1") return acc + 1;
+        if (grade === "B2") return acc + 2;
+        if (grade === "B3") return acc + 3;
+        if (grade === "C4") return acc + 4;
+        if (grade === "C5") return acc + 5;
+        if (grade === "C6") return acc + 6;
+        if (grade === "D7") return acc + 7;
+        if (grade === "E8") return acc + 8;
+        if (grade === "F9") return acc + 9;
+        if (grade === "A") return acc + 1;
+        if (grade === "B") return acc + 2;
+        if (grade === "C") return acc + 3;
+        if (grade === "D") return acc + 4;
+        if (grade === "E") return acc + 5;
+        if (grade === "F") return acc + 6;
+        return acc;
+      }, 0);
+      const totalPoints = (corepoints || 0) + (electivepoints || 0);
+      return totalPoints;
+    }
+    return null;
+    // Add logic for other exam types if needed
+  };
+
   const displayConditions = application?.applicant?.medicalConditions
     ? application.applicant.medicalConditions
         .split(",")
@@ -151,7 +198,7 @@ export function ApplicationPreview({
               <AccordionTrigger className="flex-1 text-base font-semibold hover:no-underline p-0 print:text-lg">
                 Program Details
               </AccordionTrigger>
-              {!isPdfMode && onEdit && (
+              {!isPdfMode && !disable && onEdit && (
                   <Button variant="ghost" size="sm" className="ml-4 h-7 gap-1 text-xs text-blue-600 hover:bg-blue-50 print:hidden" onClick={(e) => {e.stopPropagation(); onEdit(1);}}> <Edit className="h-3 w-3" /> Edit </Button>
               )}
             </div>
@@ -167,14 +214,14 @@ export function ApplicationPreview({
               <AccordionTrigger className="flex-1 text-base font-semibold hover:no-underline p-0 print:text-lg">
                 Academic Details
               </AccordionTrigger>
-              {!isPdfMode && onEdit && (
+              {!isPdfMode && !disable && onEdit && (
                   <Button variant="ghost" size="sm" className="ml-4 h-7 gap-1 text-xs text-blue-600 hover:bg-blue-50 print:hidden" onClick={(e) => {e.stopPropagation(); onEdit(2);}}> <Edit className="h-3 w-3" /> Edit </Button>
               )}
             </div>
             <AccordionContent className="px-6 pb-4 pt-0 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-2 print:grid-cols-2">
                 <div className="col-span-1"><dt className="text-sm font-medium text-gray-600 print:text-xs">Application Type</dt><dd className="text-sm text-gray-900 print:text-xs">{application.examinationType || '-'}</dd></div>
-                <div className="col-span-1"><dt className="text-sm font-medium text-gray-600 print:text-xs">Aggregate Grade</dt><dd className="text-sm text-gray-900 print:text-xs">{application.aggregateGrade || '-'}</dd></div>
+                <div className="col-span-1"><dt className="text-sm font-medium text-gray-600 print:text-xs">Aggregate Grade</dt><dd className="text-sm text-gray-900 print:text-xs">{calculateGrade(application.examinationType || '') || '-'}</dd></div>
               </div>
               {(allSubjects.length > 0) && (
                   <Table className="print:text-xs">
@@ -208,7 +255,7 @@ export function ApplicationPreview({
               <AccordionTrigger className="flex-1 text-base font-semibold hover:no-underline p-0 print:text-lg">
                 Personal Details
               </AccordionTrigger>
-              {!isPdfMode && onEdit && (
+              {!isPdfMode && !disable && onEdit && (
                   <Button variant="ghost" size="sm" className="ml-4 h-7 gap-1 text-xs text-blue-600 hover:bg-blue-50 print:hidden" onClick={(e) => {e.stopPropagation(); onEdit(3);}}> <Edit className="h-3 w-3" /> Edit </Button>
               )}
             </div>
@@ -222,16 +269,16 @@ export function ApplicationPreview({
                 </Avatar>
               </div>
               <dl>
-                <DetailItem label="First Name" value={application.applicant?.firstName} />
-                <DetailItem label="Middle Name" value={application.applicant?.middleName} />
-                <DetailItem label="Last Name" value={application.applicant?.lastName} />
+                <DetailItem label="Given Names" value={application.applicant?.firstName} />
+                <DetailItem label="Surname" value={application.applicant?.lastName} />
+                <DetailItem label="Ghana Card" value={application.applicant?.ghanaCardNumber} />
                 <DetailItem label="Gender" value={application.applicant?.gender} />
                 <DetailItem label="Date of Birth" value={formattedDob} />
                 <DetailItem label="Birth Place (Town/City)" value={application.applicant?.placeOfBirth} />
                 <DetailItem label="Country of Birth" value={application.applicant?.country} />
                 <DetailItem label="Nationality" value={application.applicant?.nationality} />
-                <DetailItem label="Region of Birth" value={application.applicant?.district?.region?.name} />
-                <DetailItem label="District of Birth" value={application.applicant?.district?.name} />
+                {/* <DetailItem label="Region of Birth" value={application.applicant?.district?.region?.name} /> */}
+                {/* <DetailItem label="District of Birth" value={application.applicant?.district?.name} /> */}
                 <DetailItem label="Languages Spoken" value={application.applicant?.languagesSpoken} />
                 <DetailItem label="Medical Condition/Disability" value={displayConditions} />
               </dl>
@@ -243,7 +290,7 @@ export function ApplicationPreview({
               <AccordionTrigger className="flex-1 text-base font-semibold hover:no-underline p-0 print:text-lg">
                 Contact & Parent/Guardian Details
               </AccordionTrigger>
-              {!isPdfMode && onEdit && (
+              {!isPdfMode && !disable && onEdit && (
                   <Button variant="ghost" size="sm" className="ml-4 h-7 gap-1 text-xs text-blue-600 hover:bg-blue-50 print:hidden" onClick={(e) => {e.stopPropagation(); onEdit(3);}}> <Edit className="h-3 w-3" /> Edit </Button>
               )}
             </div>
