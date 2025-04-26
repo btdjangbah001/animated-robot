@@ -83,7 +83,7 @@ const initialFormState: PersonalDetailsState = {
   ghanaCardNumber: "",
 };
 
-const TARGET_ASPECT_RATIO = 35 / 45;
+const TARGET_ASPECT_RATIO = 175 / 225; // 35x45
 const ASPECT_RATIO_TOLERANCE = 0.1;
 
 export function PersonalDetailsForm({
@@ -118,6 +118,7 @@ export function PersonalDetailsForm({
     (state) => state.updateApplicantDetails,
   );
   const updateApplication = useApplicationStore(state => state.updateApplication)
+  const setLoading = useApplicationStore(state => state.setLoading)
   const isLoading = useApplicationStore((state) => state.isLoading);
   const error = useApplicationStore((state) => state.error);
   const setError = useApplicationStore((state) => state.setError);
@@ -306,19 +307,21 @@ export function PersonalDetailsForm({
           const lowerBound = TARGET_ASPECT_RATIO - ASPECT_RATIO_TOLERANCE;
           const upperBound = TARGET_ASPECT_RATIO + ASPECT_RATIO_TOLERANCE;
 
-          if (width === 35 && height === 45) {
+          if (width === 175 && height === 225) {
             setProfilePhoto(file);
             setPhotoPreview(URL.createObjectURL(file));
           } else if (aspectRatio >= lowerBound && aspectRatio <= upperBound) {
-            toast.warn(`Photo aspect ratio is acceptable but not exactly 35x45 (${width}x${height}). Resizing might occur.`);
+            // toast.warn(`Photo aspect ratio is acceptable but not exactly 35mm x 45mm (${width}x${height}). Resizing might occur.`);
             setProfilePhoto(file);
             setPhotoPreview(URL.createObjectURL(file));
           } else {
-            toast.error(`Incorrect dimensions/ratio. Please upload a 35x45 passport photo. Your image is ${width}x${height}.`);
-            setProfilePhoto(null);
-            if (application?.applicant?.profilePhotoId) { fetchPhotoPreviewUrl(application.applicant.profilePhotoId).then(() => {}); }
-            else { setPhotoPreview(null); }
-            inputElement.value = '';
+            toast.warn(`Incorrect dimensions/ratio. Please upload a 35mm x 45mm passport photo. Your image is ${width}x${height}.`);
+            setProfilePhoto(file);
+            setPhotoPreview(URL.createObjectURL(file));
+            // setProfilePhoto(null);
+            // if (application?.applicant?.profilePhotoId) { fetchPhotoPreviewUrl(application.applicant.profilePhotoId).then(() => {}); }
+            // else { setPhotoPreview(null); }
+            // inputElement.value = '';
           }
         };
         img.onerror = () => {
@@ -395,6 +398,7 @@ export function PersonalDetailsForm({
 
     if (profilePhoto) {
       try {
+        setLoading(true);
         const presignResponse = await axiosInstance.post(
           "/api/v1.0/files/upload",
           { name: profilePhoto.name },
@@ -410,7 +414,9 @@ export function PersonalDetailsForm({
         if (!uploadResponse.ok) throw new Error("Failed to upload photo.");
         profilePhotoIdToSubmit = newPhotoId;
         setError(null);
+        setLoading(false);
       } catch (uploadError) {
+        setLoading(false);
         setError(
           `Photo upload failed: ${uploadError || "Please try again."}`,
         );

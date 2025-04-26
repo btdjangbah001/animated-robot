@@ -32,6 +32,7 @@ interface ApplicationActions {
     fetchApplication: () => Promise<void>;
     updateApplication: (payload: Partial<ApplicationInput>) => Promise<boolean>;
     updateApplicantDetails: (payload: ApplicantInput) => Promise<boolean>;
+    saveFile: (name: string) => Promise<any>;
     setLoading: (isLoading: boolean) => void;
     setError: (error: string | null) => void;
     clearApplication: () => void;
@@ -108,6 +109,25 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
             }
             set({ isLoading: false, error: message });
             return false;
+        }
+    },
+
+    saveFile: async (name: String): Promise<any> => {
+        set({ isLoading: true, error: null });
+        try {
+            const presignResponse = await axiosInstance.post(
+                "/api/v1.0/files/upload",
+                { name: name },
+              );
+            set({ isLoading: false });
+            return presignResponse.data;
+        } catch (error) {
+            let message = "Failed to save file progress.";
+            if (error instanceof AxiosError && error.response?.data?.message) {
+                message = error.response.data.message;
+            }
+            set({ isLoading: false, error: message });
+            return null;
         }
     },
 

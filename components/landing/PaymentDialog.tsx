@@ -17,7 +17,7 @@ import { toast } from 'react-toastify';
 import { Check } from 'lucide-react';
 
 const PHONE_REGEX = /^0\d{9}$/;
-
+const GHANA_CARD_REGEX = /^[A-Z]{3}-\d{9}-\d$/;
 interface PaymentDialogProps {
   open: boolean;
   onClose: () => void;
@@ -48,6 +48,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
     if (!paymentData.lastName) newErrors.lastName = 'Last name is required';
     if (!paymentData.email) newErrors.email = 'Email is required';
     if (!paymentData.mobileMoneyNumber || !PHONE_REGEX.test(paymentData.mobileMoneyNumber)) newErrors.mobileMoneyNumber = 'Please enter a valid mobile money number';
+    if (paymentData.ghanaCardNumber && !GHANA_CARD_REGEX.test(paymentData.ghanaCardNumber)) newErrors.ghanaCardNumber = 'Please enter a valid Ghana card number';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -200,8 +201,10 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   value={paymentData.ghanaCardNumber}
                   onChange={handleChange}
                   placeholder="e.g., GHA-123456789-0"
-
                 />
+                {errors.ghanaCardNumber && (
+                  <p className="text-xs text-red-600 mt-1">{errors.ghanaCardNumber}</p>
+                )}
               </div>
             </div>
           </div>
