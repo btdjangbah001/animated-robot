@@ -22,7 +22,7 @@ const headerNavItems = [
   { href: '/portal/download', label: 'Download Form', icon: Download, activeSlug: '/downloads' },
 ];
 
-const dropdownNavItems: any[] = [];
+const dropdownNavItems: {href: string, label: string, activeSlug: string}[] = [];
 
 
 export function AppHeader() {
@@ -105,7 +105,7 @@ export function AppHeader() {
                 return (
                     <DropdownMenuItem key={item.label} asChild className={cn(isActive && 'bg-green-50')}>
                       <Link href={item.href} className={cn("flex items-center gap-2 cursor-pointer w-full", isActive ? 'text-green-700 font-medium' : 'text-gray-700')}>
-                        {item.icon && <item.icon className="h-4 w-4" />}
+                        {/* {item.icon && <item.icon className="h-4 w-4" />} */}
                         <span>{item.label}</span>
                       </Link>
                     </DropdownMenuItem>
