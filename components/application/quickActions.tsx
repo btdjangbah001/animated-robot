@@ -1,12 +1,10 @@
 import Link from "next/link";
-import { Download, Bell, FileText, Printer } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import {Download, Printer} from "lucide-react";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {cn} from "@/lib/utils";
 
 const actions = [
   { href: "#", label: "Download", icon: Download },
-  { href: "#", label: "Notifications", icon: Bell },
-  { href: "#", label: "My Form", icon: FileText },
   { href: "#", label: "Print Form", icon: Printer },
 ];
 

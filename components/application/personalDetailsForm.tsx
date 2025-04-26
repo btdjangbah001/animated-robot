@@ -26,7 +26,6 @@ interface PersonalDetailsFormProps {
 
 interface PersonalDetailsState {
   firstName: string;
-  middleName: string;
   lastName: string;
   gender: string;
   dob: string;
@@ -44,9 +43,10 @@ interface PersonalDetailsState {
   email: string;
   parentName: string;
   parentContact: string;
+  ghanaCardNumber: string;
 }
 
-const genderOptions = ["Male", "Female"];
+const genderOptions: ("MALE" | "FEMALE")[] = ["MALE", "FEMALE"];
 const nationalityOptions = nationalities;
 const countryOptions = countries;
 const medicalConditions = [
@@ -63,7 +63,6 @@ const medicalConditions = [
 
 const initialFormState: PersonalDetailsState = {
   firstName: "",
-  middleName: "",
   lastName: "",
   gender: "",
   dob: "",
@@ -81,7 +80,11 @@ const initialFormState: PersonalDetailsState = {
   email: "",
   parentName: "",
   parentContact: "",
+  ghanaCardNumber: "",
 };
+
+const TARGET_ASPECT_RATIO = 35 / 45;
+const ASPECT_RATIO_TOLERANCE = 0.1;
 
 export function PersonalDetailsForm({
   onNext,
@@ -92,7 +95,7 @@ export function PersonalDetailsForm({
     useState<PersonalDetailsState>({...initialFormState,
       contactDistrictId: application?.applicant?.contactInformation?.district?.id?.toString() ?? "",
       contactRegionId: application?.applicant?.contactInformation?.district?.regionId?.toString() ?? "",
-      gender: application?.applicant?.gender === "MALE" ? "Male" : "Female",
+      gender: application?.applicant?.gender ?? "",
       nationality: application?.applicant?.nationality ?? "",
       country: application?.applicant?.country ?? "",
     });
@@ -118,8 +121,9 @@ export function PersonalDetailsForm({
   const isLoading = useApplicationStore((state) => state.isLoading);
   const error = useApplicationStore((state) => state.error);
   const setError = useApplicationStore((state) => state.setError);
+  const disable = application?.registrationStage === "SUBMITTED";
 
-  const fetchRegions = useCallback(async () => { 
+  const fetchRegions = useCallback(async () => {
     setLoadingRegions(true);
     try {
       const response = await axiosInstance.post(
@@ -210,7 +214,6 @@ export function PersonalDetailsForm({
 
       const loadedState: PersonalDetailsState = {
         firstName: app.firstName || "",
-        middleName: app.middleName || "",
         lastName: app.lastName || "",
         gender: app.gender || "",
         dob: app.dateOfBirth
@@ -230,6 +233,7 @@ export function PersonalDetailsForm({
         email: app.email || "",
         parentName: contact?.contactPersonName || "",
         parentContact: contact?.contactPersonPhoneNUmber || "",
+        ghanaCardNumber: app.ghanaCardNumber || "",
       };
 
       setFormState(loadedState);
@@ -289,16 +293,49 @@ export function PersonalDetailsForm({
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    const inputElement = event.target;
+
     if (file) {
-      setProfilePhoto(file);
-      setPhotoPreview(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const width = img.naturalWidth;
+          const height = img.naturalHeight;
+          const aspectRatio = width / height;
+          const lowerBound = TARGET_ASPECT_RATIO - ASPECT_RATIO_TOLERANCE;
+          const upperBound = TARGET_ASPECT_RATIO + ASPECT_RATIO_TOLERANCE;
+
+          if (width === 35 && height === 45) {
+            setProfilePhoto(file);
+            setPhotoPreview(URL.createObjectURL(file));
+          } else if (aspectRatio >= lowerBound && aspectRatio <= upperBound) {
+            toast.warn(`Photo aspect ratio is acceptable but not exactly 35x45 (${width}x${height}). Resizing might occur.`);
+            setProfilePhoto(file);
+            setPhotoPreview(URL.createObjectURL(file));
+          } else {
+            toast.error(`Incorrect dimensions/ratio. Please upload a 35x45 passport photo. Your image is ${width}x${height}.`);
+            setProfilePhoto(null);
+            if (application?.applicant?.profilePhotoId) { fetchPhotoPreviewUrl(application.applicant.profilePhotoId).then(() => {}); }
+            else { setPhotoPreview(null); }
+            inputElement.value = '';
+          }
+        };
+        img.onerror = () => {
+          toast.error("Could not read image dimensions.");
+          setProfilePhoto(null);
+          if (application?.applicant?.profilePhotoId) { fetchPhotoPreviewUrl(application.applicant.profilePhotoId).then(() => {}); } else { setPhotoPreview(null); }
+          inputElement.value = '';
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => { toast.error("Failed to read file."); inputElement.value = ''; };
+      reader.readAsDataURL(file);
+
     } else {
       setProfilePhoto(null);
-      if (application?.applicant?.profilePhotoId) {
-        fetchPhotoPreviewUrl(application.applicant.profilePhotoId).then(()=>{});
-      } else {
-        setPhotoPreview(null);
-      }
+      if (application?.applicant?.profilePhotoId) { fetchPhotoPreviewUrl(application.applicant.profilePhotoId); }
+      else { setPhotoPreview(null); }
     }
   };
 
@@ -324,7 +361,12 @@ export function PersonalDetailsForm({
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    setError(null);
+
+    if (disable){
+      onNext();
+      return;
+    }
+
     if (!applicationId || !application?.applicant?.id) {
       toast.error("Application/Applicant ID not found.");
       return;
@@ -378,11 +420,10 @@ export function PersonalDetailsForm({
 
     const applicantPayload: ApplicantInput = {
       firstName: formState.firstName || "",
-      middleName: formState.middleName || "",
       lastName: formState.lastName || "",
       phoneNumber: formState.phone || "",
       email: formState.email || "",
-      gender: formState.gender === "Male" ? "MALE" : "FEMALE",
+      gender: formState.gender || "",
       dateOfBirth: formState.dob ? new Date(formState.dob).getTime() : 0,
       placeOfBirth: formState.birthPlace || "",
       country: formState.country || "",
@@ -392,6 +433,7 @@ export function PersonalDetailsForm({
         ? ""
         : formState.selectedConditions.join(", "),
       profilePhotoId: profilePhotoIdToSubmit,
+      ghanaCardNumber: formState.ghanaCardNumber,
       contactInformation: {
         address: formState.address || "",
         city: formState.city || "",
@@ -434,7 +476,7 @@ export function PersonalDetailsForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="firstName">
-                First Name <span className="text-red-500">*</span>
+                Given Names <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="firstName"
@@ -447,19 +489,8 @@ export function PersonalDetailsForm({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="middleName">Middle Name</Label>
-              <Input
-                id="middleName"
-                name="middleName"
-                className="focus:ring-green-500"
-                value={formState.middleName}
-                onChange={handleInputChange}
-                disabled={isLoading}
-              />
-            </div>
-            <div className="space-y-1.5">
               <Label htmlFor="lastName">
-                Last Name <span className="text-red-500">*</span>
+                Surame <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="lastName"
@@ -472,6 +503,17 @@ export function PersonalDetailsForm({
               />
             </div>
             <div className="space-y-1.5">
+              <Label htmlFor="ghanaCardNumber">Ghana Card Number</Label>
+              <Input
+                id="ghanaCardNumber"
+                name="ghanaCardNumber"
+                className="focus:ring-green-500"
+                value={formState.ghanaCardNumber}
+                onChange={handleInputChange}
+                disabled={isLoading || disable}
+              />
+            </div>
+            <div className="space-y-1.5">
               <Label htmlFor="gender">
                 Gender <span className="text-red-500">*</span>
               </Label>
@@ -480,7 +522,7 @@ export function PersonalDetailsForm({
                 value={formState.gender}
                 onValueChange={(value) => handleSelectChange("gender", value)}
                 required
-                disabled={isLoading}
+                disabled={isLoading || disable}
               >
                 <SelectTrigger id="gender" className="w-full focus:ring-green-500">
                   <SelectValue placeholder="Select Gender" />
@@ -506,7 +548,7 @@ export function PersonalDetailsForm({
                 onChange={handleInputChange}
                 required
                 className="block w-full focus:ring-green-500"
-                disabled={isLoading}
+                disabled={isLoading || disable}
               />
             </div>
             <div className="space-y-1.5">
@@ -520,7 +562,7 @@ export function PersonalDetailsForm({
                 value={formState.birthPlace}
                 onChange={handleInputChange}
                 required
-                disabled={isLoading}
+                disabled={isLoading || disable}
               />
             </div>
             <div className="space-y-1.5">
@@ -534,7 +576,7 @@ export function PersonalDetailsForm({
                       handleSelectChange("country", value)
                   }
                   required
-                  disabled={isLoading}
+                  disabled={isLoading || disable}
               >
                 <SelectTrigger id="country" className="w-full focus:ring-green-500">
                   <SelectValue placeholder="Select Country" />
@@ -559,7 +601,7 @@ export function PersonalDetailsForm({
                   handleSelectChange("nationality", value)
                 }
                 required
-                disabled={isLoading}
+                disabled={isLoading || disable}
               >
                 <SelectTrigger id="nationality" className="w-full focus:ring-green-500">
                   <SelectValue placeholder="Select Nationality" />
@@ -585,7 +627,7 @@ export function PersonalDetailsForm({
                 onChange={handleInputChange}
                 required
                 placeholder="e.g. English, Twi"
-                disabled={isLoading}
+                disabled={isLoading || disable}
               />
             </div>
           </div>
@@ -608,6 +650,7 @@ export function PersonalDetailsForm({
                       handleConditionChange(checked, condition.id)
                     }
                     disabled={
+                      disable ||
                       isLoading ||
                       (condition.id !== "none" &&
                         formState.selectedConditions.includes("none"))
@@ -634,7 +677,8 @@ export function PersonalDetailsForm({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
             <div className="space-y-3">
-              <Label className="font-medium text-gray-700">
+              <span className="text-sm text-gray-500"><strong>Please make sure to upload a clear passport photo</strong></span>
+              <Label className="font-medium pt-4 text-gray-700">
                 Profile Photo <span className="text-red-500">*</span>{" "}
               </Label>
               <Input
@@ -645,14 +689,14 @@ export function PersonalDetailsForm({
                 ref={fileInputRef}
                 className="hidden"
                 required={!profilePhoto && !photoPreview}
-                disabled={isLoading}
+                disabled={isLoading || disable}
               />
               <div className="flex items-center gap-3 flex-wrap">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleFileButtonClick}
-                  disabled={isLoading}
+                  disabled={isLoading || disable}
                 >
                   {" "}
                   <Paperclip className="mr-2 h-4 w-4" /> Choose File{" "}
@@ -670,7 +714,7 @@ export function PersonalDetailsForm({
                       className="h-6 w-6 text-gray-500 hover:text-red-600"
                       onClick={clearFile}
                       aria-label="Remove file"
-                      disabled={isLoading}
+                      disabled={isLoading || disable}
                     >
                       {" "}
                       <X className="h-4 w-4" />{" "}
@@ -688,18 +732,15 @@ export function PersonalDetailsForm({
               </div>
             </div>
             <div className="flex justify-center md:justify-end">
-              <Avatar className="h-28 w-28 border">
-                {" "}
+              <Avatar className="h-45 w-35 border rounded-none">
                 <AvatarImage
-                  src={photoPreview ?? undefined}
-                  alt="Photo preview"
-                />{" "}
-                <AvatarFallback
-                  className={cn(isFetchingPreview && "animate-pulse")}
-                >
-                  {" "}
-                  <UserIcon className="h-12 w-12 text-gray-400" />{" "}
-                </AvatarFallback>{" "}
+                    src={photoPreview ?? undefined}
+                    alt="Photo preview"
+                    className="object-cover"
+                />
+                <AvatarFallback className={cn("rounded-none", isFetchingPreview && "animate-pulse")}>
+                  <UserIcon className="h-12 w-12 text-gray-400"/>
+                </AvatarFallback>
               </Avatar>
             </div>
           </div>
@@ -722,7 +763,7 @@ export function PersonalDetailsForm({
                   value={formState.address}
                   onChange={handleInputChange}
                   required
-                  disabled={isLoading}
+                  disabled={isLoading || disable}
                 />
               </div>
               <div className="space-y-1.5">
@@ -736,7 +777,7 @@ export function PersonalDetailsForm({
                   value={formState.city}
                   onChange={handleInputChange}
                   required
-                  disabled={isLoading}
+                  disabled={isLoading || disable}
                 />
               </div>
               <div className="space-y-1.5">
@@ -750,7 +791,7 @@ export function PersonalDetailsForm({
                     handleSelectChange("contactRegionId", value)
                   }
                   required
-                  disabled={isLoading || loadingRegions}
+                  disabled={isLoading || loadingRegions || disable}
                 >
                   <SelectTrigger id="contactRegionId" className="w-full focus:ring-green-500">
                     <SelectValue placeholder="Select Region" />
@@ -782,6 +823,7 @@ export function PersonalDetailsForm({
                   }
                   required
                   disabled={
+                    disable ||
                     isLoading ||
                     loadingContactDistricts ||
                     !formState.contactRegionId
@@ -820,7 +862,7 @@ export function PersonalDetailsForm({
                   value={formState.digitalAddress}
                   onChange={handleInputChange}
                   placeholder="e.g. GA-123-4567"
-                  disabled={isLoading}
+                  disabled={isLoading || disable}
                 />
               </div>
               <div className="space-y-1.5">
@@ -835,7 +877,7 @@ export function PersonalDetailsForm({
                   value={formState.phone}
                   onChange={handleInputChange}
                   required
-                  disabled={isLoading}
+                  disabled={isLoading || disable}
                 />
               </div>
               <div className="space-y-1.5">
@@ -874,7 +916,7 @@ export function PersonalDetailsForm({
                   value={formState.parentName}
                   onChange={handleInputChange}
                   required
-                  disabled={isLoading}
+                  disabled={isLoading || disable}
                 />
               </div>
               <div className="space-y-1.5">
@@ -889,7 +931,7 @@ export function PersonalDetailsForm({
                   value={formState.parentContact}
                   onChange={handleInputChange}
                   required
-                  disabled={isLoading}
+                  disabled={isLoading || disable}
                 />
               </div>
             </div>

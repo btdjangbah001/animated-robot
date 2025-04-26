@@ -11,7 +11,6 @@ export interface ContactInformationInput {
 
 export interface ApplicantInput {
   firstName?: string | null;
-  middleName?: string | null;
   lastName?: string | null;
   phoneNumber?: string | null;
   ghanaCardNumber?: string | null;
@@ -25,6 +24,7 @@ export interface ApplicantInput {
   medicalConditions?: string | null;
   profilePhotoId?: number | null;
   contactInformation?: ContactInformationInput | null;
+  ghanaCardPhotoId?: string | null;
 }
 
 export interface CoreResultInput {
@@ -54,7 +54,6 @@ export interface ApplicationInput {
     | "PERSONAL_DETAILS"
     | "DRAFT"
     | "SUBMITTED"
-  submissionDate?: number | null; // Timestamp
   applicant?: ApplicantInput | null;
   electiveResults?: ElectiveResultInput[] | null;
   coreResults?: CoreResultInput[] | null;
