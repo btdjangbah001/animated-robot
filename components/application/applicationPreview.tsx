@@ -15,6 +15,7 @@ import {CoreResultOutput, ElectiveResultOutput} from "@/types/applicant";
 import {toast} from "react-toastify";
 import Link from "next/link";
 import {Warning} from "../ui/warning";
+import { Separator } from "../ui/separator";
 
 interface ApplicationPreviewProps {
   onBack: () => void;
@@ -57,6 +58,25 @@ export function ApplicationPreview({
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [isLoadingPhotoUrl, setIsLoadingPhotoUrl] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+
+  // Helper function to format date strings
+  const getSafeDateString = (
+    timestampMs: number | string | null | undefined,
+  ): string => {
+    if (!timestampMs) return "";
+    try {
+      const date = new Date(timestampMs);
+      if (isNaN(date.getTime())) return "";
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      if (year < 1900 || year > 2100) return ""; // Basic validation
+      return `${year}-${month}-${day}`;
+    } catch (e) {
+      console.error("Error formatting date:", e);
+      return "";
+    }
+  };
 
   useEffect(() => {
     if (!application && !isLoading && !error) {
@@ -244,10 +264,11 @@ export function ApplicationPreview({
           </div>
           <AccordionContent className="px-6 pb-4 pt-0 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-2 print:grid-cols-2">
-              <div className="col-span-1"><dt className="text-sm font-medium text-gray-600 print:text-xs">Application Type</dt><dd className="text-sm text-gray-900 print:text-xs">{application.examinationType || '-'}</dd></div>
-              <div className="col-span-1"><dt className="text-sm font-medium text-gray-600 print:text-xs">Aggregate Grade</dt><dd className="text-sm text-gray-900 print:text-xs">{calculateGrade(application.examinationType || '') || '-'}</dd></div>
+             { !application?.program?.programType?.postBasic && <div className="col-span-1"><dt className="text-sm font-medium text-gray-600 print:text-xs">Application Type</dt><dd className="text-sm text-gray-900 print:text-xs">{application.examinationType || '-'}</dd></div> }
+             { application?.program?.programType?.postBasic && <div className="col-span-1"><dt className="text-sm font-medium text-gray-600 print:text-xs">Application Type</dt><dd className="text-sm text-gray-900 print:text-xs">Post Basic</dd></div> }
+             { !application?.program?.programType?.postBasic && <div className="col-span-1"><dt className="text-sm font-medium text-gray-600 print:text-xs">Aggregate Grade</dt><dd className="text-sm text-gray-900 print:text-xs">{calculateGrade(application.examinationType || '') || '-'}</dd></div> }
             </div>
-            {(allSubjects.length > 0) && (
+            {(!application?.program?.programType?.postBasic && allSubjects.length > 0) && (
               <Table className="print:text-xs">
                 <TableHeader>
                   <TableRow>
@@ -270,6 +291,55 @@ export function ApplicationPreview({
                   ))}
                 </TableBody>
               </Table>
+            )}
+            {(application?.program?.programType?.postBasic && Array.isArray(application?.academicProfiles) && application.academicProfiles.length > 0) && (
+              <><h3>Academic Profiles</h3>
+              <Table className="print:text-xs">
+                <TableHeader>
+                  <TableRow>
+                  <TableHead className="w-[25%] sm:w-[20%] print:w-[20%]">Institution</TableHead>
+                    <TableHead className="w-[30%] sm:w-[30%] print:w-[30%]">Qualification</TableHead>
+                    <TableHead className="w-[20%] sm:w-[20%] print:w-[20%]">Start Date</TableHead>
+                    <TableHead className="w-[15%] sm:w-[20%] print:w-[20%]">End Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {application.academicProfiles.map((s, index) => (
+                    <TableRow key={s.id || index}>
+                      <TableCell>{s.institution}</TableCell>
+                      <TableCell>{s.qualification}</TableCell>
+                      <TableCell>{getSafeDateString(s.startDate)}</TableCell>
+                      <TableCell>{getSafeDateString(s.endDate)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              </>
+            )}
+            { application?.program?.programType?.postBasic && <Separator />}
+            {(application?.program?.programType?.postBasic && Array.isArray(application?.workExperiences) && application.workExperiences.length > 0) && (
+              <><h3>Work Experiences</h3>
+              <Table className="print:text-xs">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[25%] sm:w-[20%] print:w-[20%]">Institution</TableHead>
+                    <TableHead className="w-[30%] sm:w-[30%] print:w-[30%]">Job Title</TableHead>
+                    <TableHead className="w-[20%] sm:w-[20%] print:w-[20%]">Start Date</TableHead>
+                    <TableHead className="w-[15%] sm:w-[20%] print:w-[20%]">End Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {application.workExperiences.map((s, index) => (
+                    <TableRow key={s.id || index}>
+                      <TableCell>{s.institution}</TableCell>
+                      <TableCell>{s.jobTitle}</TableCell>
+                      <TableCell>{getSafeDateString(s.startDate)}</TableCell>
+                      <TableCell>{getSafeDateString(s.endDate)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              </>
             )}
           </AccordionContent>
         </AccordionItem>

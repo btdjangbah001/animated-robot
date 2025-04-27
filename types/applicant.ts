@@ -4,6 +4,7 @@ export interface ProgramTypeOutput {
     id: number;
     title: string | null;
     description: string | null;
+    postBasic: boolean | null;
 }
 
 export interface ProgramOutput {
@@ -91,6 +92,22 @@ export interface CoreResultOutput {
     subject?: SubjectOutput | null;
 }
 
+export interface AcademicProfileOutput {
+    id: number;
+    institution: string | null;
+    qualification: string | null;
+    startDate: number | null;
+    endDate: number | null;
+}
+
+export interface WorkExperienceOutput {
+    id: number;
+    institution: string | null;
+    jobTitle: string | null;
+    startDate: number | null;
+    endDate: number | null;
+}
+
 export interface ElectiveResultOutput {
     id: number;
     subjectId: number;
@@ -115,8 +132,10 @@ export interface ApplicationOutput {
     applicant: ApplicantOutput | null;
     electiveResults: ElectiveResultOutput[] | null;
     coreResults: CoreResultOutput[] | null;
+    academicProfiles: AcademicProfileOutput[] | null;
+    workExperiences: WorkExperienceOutput[] | null;
     applicationPin?: string | null;
-    status: "PENDING" | "APPROVED" | "REJECTED" | "IN_REVIEW" | "NEW" | null;
+    status: "PENDING" | "APPROVED" | "REJECTED" | "IN_REVIEW" | "NEW" | "FAILED_ELIGIBILITY" | "PASSED_ELIGIBILITY" | "INTERVIEW_SCHEDULED" | null;
     aggregateGrade?: number | string | null;
 }
 

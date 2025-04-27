@@ -319,7 +319,7 @@ export function PersonalDetailsForm({
             setProfilePhoto(file);
             setPhotoPreview(URL.createObjectURL(file));
           } else {
-            toast.warn(`Incorrect dimensions/ratio. Please upload a 35mm x 45mm passport photo. Your image is ${width}x${height}.`);
+            // toast.warn(`Incorrect dimensions/ratio. Please upload a 35mm x 45mm passport photo. Your image is ${width}x${height}.`);
             setProfilePhoto(file);
             setPhotoPreview(URL.createObjectURL(file));
             // setProfilePhoto(null);
