@@ -42,7 +42,7 @@ export default function DownloadApplicationPage() {
                             <ApplicationPreview
                                 isPdfMode={true}
                                 onBack={() => {}}
-                                onSubmit={() => {}}
+                                onSubmit={async () => Promise.resolve()}
                                 onEdit={() => {}}
                             />
                         </div>
