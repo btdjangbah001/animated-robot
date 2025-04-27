@@ -101,8 +101,8 @@ export function AcademicDetailsForm({
       const electivesFromStore = application.electiveResults?.map((res) => ({
         id: res.id?.toString() ?? crypto.randomUUID(),
         dbId: res.id ?? null,
-        waecCourseId: res.courseId?.toString() || "",
-        subjectId: res.subjectId?.toString() || "",
+        waecCourseId: res.course?.id?.toString() || "",
+        subjectId: res.subject?.id?.toString() || "",
         grade: res.grade || "",
         indexNumber: res.indexNumber || "",
         examYear: res.year?.toString() || "",

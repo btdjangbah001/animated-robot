@@ -107,7 +107,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
         <DialogContent dividers className="space-y-4 pt-4">
     
             <Alert variant="filled" severity="error" className="mb-4">
-              Please complete all NAME fields exactly as they appear on your official certificate. Once you submit your NAME, it cannot be changed. Please ensure your entry exactly matches your certificate before proceeding.
+              Please enter your SURNAME and OTHER NAMES exactly as they appear on your official certificate. Once submitted, your SURNAME and OTHER NAMES cannot be changed. Ensure that your NAMES match your certificate before pressing the Pay button.
             </Alert>
           
 

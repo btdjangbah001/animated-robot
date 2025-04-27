@@ -17,8 +17,7 @@ export function ProgressSteps({ steps, currentStepId }: ProgressStepsProps) {
       <div className="absolute top-[15px] left-0 right-0 h-0.5 bg-gray-200" />
 
       <div className="relative flex justify-between">
-        {steps.map((step, index) => {
-          console.log("step", index);
+        {steps.map((step) => {
           const isCompleted = step.id < currentStepId;
           const isActive = step.id === currentStepId;
 

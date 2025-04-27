@@ -82,8 +82,8 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
     if (application) {
       const initialProgramTypeId =
         application.program?.programTypeId?.toString() ?? "";
-      const initialInstitutionId = application.institutionId?.toString() ?? "";
-      const initialProgramId = application.programId?.toString() ?? "";
+      const initialInstitutionId = application.institution?.id?.toString() ?? "";
+      const initialProgramId = application.program?.id?.toString() ?? "";
 
       setSelectedProgramTypeId(initialProgramTypeId);
       setSelectedInstitutionId(initialInstitutionId);
@@ -99,21 +99,26 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
 
   useEffect(() => {
     if (selectedProgramTypeId) {
-      fetchInstitutions(selectedProgramTypeId).then(() => {});
+      fetchInstitutions(selectedProgramTypeId).then(() => {
+        setSelectedInstitutionId(application?.institution?.id?.toString() ?? "");
+      });
     } else {
       clearInstitutions();
     }
-  }, [selectedProgramTypeId, fetchInstitutions, clearInstitutions]);
+  }, [application, selectedProgramTypeId, fetchInstitutions, clearInstitutions]);
 
   useEffect(() => {
     if (selectedInstitutionId && selectedProgramTypeId) {
       fetchPrograms(selectedProgramTypeId, selectedInstitutionId).then(
-        () => {},
+        () => {
+          setSelectedProgramId(application?.program?.id?.toString() ?? "");
+        },
       );
     } else {
       clearPrograms();
     }
   }, [
+    application,
     selectedInstitutionId,
     selectedProgramTypeId,
     fetchPrograms,

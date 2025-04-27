@@ -86,6 +86,9 @@ const initialFormState: PersonalDetailsState = {
 const TARGET_ASPECT_RATIO = 175 / 225; // 35x45
 const ASPECT_RATIO_TOLERANCE = 0.1;
 
+const GHANA_CARD_REGEX = /^[A-Z]{3}-\d{9}-\d$/;
+const PHONE_REGEX = /^0\d{9}$/;
+
 export function PersonalDetailsForm({
   onNext,
   onBack,
@@ -123,6 +126,7 @@ export function PersonalDetailsForm({
   const error = useApplicationStore((state) => state.error);
   const setError = useApplicationStore((state) => state.setError);
   const disable = application?.registrationStage === "SUBMITTED";
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const fetchRegions = useCallback(async () => {
     setLoadingRegions(true);
@@ -362,8 +366,23 @@ export function PersonalDetailsForm({
     onBack();
   };
 
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formState.firstName) newErrors.fullName = 'First name is required';
+    if (!formState.lastName) newErrors.lastName = 'Last name is required';
+    if (!formState.email) newErrors.email = 'Email is required';
+    if (!formState.phone || !PHONE_REGEX.test(formState.phone)) newErrors.phone = 'Please enter a valid mobile money number';
+    if (formState.ghanaCardNumber && !GHANA_CARD_REGEX.test(formState.ghanaCardNumber)) newErrors.ghanaCardNumber = 'Please enter a valid Ghana card number';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    if (!validate()) {
+      toast.error("Please fix the errors in the form.");
+      return;
+    };
 
     if (disable){
       onNext();
@@ -518,6 +537,9 @@ export function PersonalDetailsForm({
                 onChange={handleInputChange}
                 disabled={isLoading || disable}
               />
+              {errors.ghanaCardNumber && (
+                  <p className="text-xs text-red-600 mt-1">{errors.ghanaCardNumber}</p>
+                )}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="gender">
@@ -885,6 +907,9 @@ export function PersonalDetailsForm({
                   required
                   disabled={isLoading || disable}
                 />
+                {errors.phone && (
+                  <p className="text-xs text-red-600 mt-1">{errors.phone}</p>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="email">
@@ -939,6 +964,9 @@ export function PersonalDetailsForm({
                   required
                   disabled={isLoading || disable}
                 />
+                {errors.parentContact && (
+                  <p className="text-xs text-red-600 mt-1">{errors.parentContact}</p>
+                )}
               </div>
             </div>
           </div>
