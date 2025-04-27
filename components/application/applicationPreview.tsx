@@ -1,23 +1,24 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useState } from "react";
-import { ArrowLeft, Edit, Loader2, Send, User as UserIcon } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, } from "@/components/ui/accordion";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {useEffect, useState} from "react";
+import {ArrowLeft, Edit, Loader2, Send, User as UserIcon} from "lucide-react";
+import {format} from "date-fns";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger,} from "@/components/ui/accordion";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table";
+import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import useApplicationStore from "@/store/applicationStore";
 import axiosInstance from "@/lib/axios";
-import { CoreResultOutput, ElectiveResultOutput } from "@/types/applicant";
-import { toast } from "react-toastify";
+import {CoreResultOutput, ElectiveResultOutput} from "@/types/applicant";
+import {toast} from "react-toastify";
 import Link from "next/link";
+import {Warning} from "../ui/warning";
 
 interface ApplicationPreviewProps {
   onBack: () => void;
-  onSubmit: () => void;
+  onSubmit: () => Promise<void>;
   onEdit: (stepId: number) => void;
   isPdfMode: boolean;
 }
@@ -55,6 +56,7 @@ export function ApplicationPreview({
 
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [isLoadingPhotoUrl, setIsLoadingPhotoUrl] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     if (!application && !isLoading && !error) {
@@ -145,8 +147,7 @@ export function ApplicationPreview({
         if (grade === "F") return acc + 6;
         return acc;
       }, 0);
-      const totalPoints = (corepoints || 0) + (electivepoints || 0);
-      return totalPoints;
+      return (corepoints || 0) + (electivepoints || 0);
     }
     return null;
     // Add logic for other exam types if needed
@@ -328,12 +329,17 @@ export function ApplicationPreview({
 
       </Accordion>
 
-      {!isPdfMode && onBack && onSubmit && (
+      {!isPdfMode && (
         <div className="flex justify-between pt-8 print:hidden">
           <Button type="button" variant="outline" onClick={onBack} disabled={isLoading}> <ArrowLeft className="mr-2 h-4 w-4" /> Back </Button>
-          {disable ? (<Link key='Download Form' href='/portal/download' passHref><Button type="button" className="bg-green-500 hover:bg-green-600">Print Application<Send className="ml-2 h-4 w-4" /> </Button></Link>) : (<Button type="button" className="bg-green-500 hover:bg-green-600" onClick={onSubmit} disabled={isLoading}> {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Submit Application <Send className="ml-2 h-4 w-4" /> </Button>)}
+          {disable ?
+              (<Link key='Download Form' href='/portal/download' passHref>
+                <Button type="button" className="bg-green-500 hover:bg-green-600">Print Application<Send className="ml-2 h-4 w-4" /> </Button>
+              </Link>)
+              : (<Button type="button" className="bg-green-500 hover:bg-green-600" onClick={()=>setModalOpen(true)} disabled={isLoading}> {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Submit Application <Send className="ml-2 h-4 w-4" /> </Button>)}
         </div>
       )}
+      <Warning open={modalOpen} setOpen={setModalOpen} onProceed={onSubmit}/>
     </div>
   );
 }
