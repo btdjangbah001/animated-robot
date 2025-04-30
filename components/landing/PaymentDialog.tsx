@@ -118,7 +118,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   htmlFor="lastName"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Surname
+                  Applicant Surname
                 </Label>
                 <Input
                   id="lastName"
@@ -135,7 +135,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   htmlFor="firstName"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Other Names
+                  Applicant Other Names
                 </Label>
                 <Input
                   id="firstName"
@@ -187,7 +187,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   <p className="text-xs text-red-600 mt-1">{errors.mobileMoneyNumber}</p>
                 )}
               </div>
-              <div className="space-y-2 sm:col-span-2">
+              {/* <div className="space-y-2 sm:col-span-2">
                 <Label
                   htmlFor="ghanaCardNumber"
                   className="text-sm font-medium text-gray-700 flex items-center"
@@ -205,7 +205,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                 {errors.ghanaCardNumber && (
                   <p className="text-xs text-red-600 mt-1">{errors.ghanaCardNumber}</p>
                 )}
-              </div>
+              </div> */}
             </div>
           </div>
         </DialogContent>

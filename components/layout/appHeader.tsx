@@ -57,7 +57,7 @@ export function AppHeader() {
         <div className="flex items-center gap-2 md:gap-4">
 
           <nav className="hidden md:flex items-center gap-1">
-            {application?.status === 'NEW' && headerNavItems.map((item) => {
+            {application?.status === 'IN_REVIEW' && headerNavItems.map((item) => {
               if (!item.label || !item.icon) return null;
 
               const isActive = pathname === item.href || (item.activeSlug && pathname.startsWith(item.activeSlug));

@@ -57,4 +57,21 @@ export interface ApplicationInput {
   applicant?: ApplicantInput | null;
   electiveResults?: ElectiveResultInput[] | null;
   coreResults?: CoreResultInput[] | null;
+  academicProfiles?: AcademicProfileInput[] | null;
+  workExperiences?: WorkExperienceInput[] | null;
+}
+
+
+export interface AcademicProfileInput {
+  institution: string | null;
+  qualification: string | null;
+  startDate: number | null;
+  endDate: number | null;
+}
+
+export interface WorkExperienceInput {
+  institution: string | null;
+  jobTitle: string | null;
+  startDate: number | null;
+  endDate: number | null;
 }

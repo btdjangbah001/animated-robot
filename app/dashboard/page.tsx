@@ -4,6 +4,7 @@ import Footer from "@/components/landing/Footer";
 import Hero from "@/components/landing/Hero";
 import Features from "@/components/landing/Features";
 import Header from "@/components/landing/Header";
+import FAQ from "@/components/landing/Faq";
 
 export default function DashboardPage() {
 
@@ -12,6 +13,7 @@ export default function DashboardPage() {
       <Header />
       <main className="flex-grow">
         <Hero />
+        <FAQ />
         <Features />
       </main>
       <Footer />

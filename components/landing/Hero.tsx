@@ -25,7 +25,7 @@ export default function Hero() {
           </p>
           
           <div className="price-tag">
-            Application Fee for {new Date().getFullYear()}: GHS{applicationFee}
+            Application Fee: GHS{applicationFee}
           </div>
           
           <div className="flex flex-col md:flex-row justify-center gap-5 mt-8">
