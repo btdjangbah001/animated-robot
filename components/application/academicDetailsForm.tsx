@@ -15,8 +15,6 @@ import {toast} from "react-toastify";
 import {mapStageToStepId} from "@/lib/consts";
 import {areCoreResultsEqual, areElectivesResultsEqual} from "@/lib/utils";
 import { Alert, AlertTitle } from "@mui/material";
-import { sub } from "date-fns";
-import { get } from "http";
 
 interface ElectiveSubjectLocal {
   id: string;
