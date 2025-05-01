@@ -2,9 +2,15 @@
 
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, SearchIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+
+interface SelectContentProps extends React.ComponentProps<typeof SelectPrimitive.Content> {
+  searchable?: boolean
+  searchPlaceholder?: string
+  onSearchChange?: (value: string) => void
+}
 
 function Select({
   ...props
@@ -54,8 +60,51 @@ function SelectContent({
   className,
   children,
   position = "popper",
+  searchable = false,
+  searchPlaceholder = "Search...",
+  onSearchChange,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Content>) {
+}: SelectContentProps) {
+  const [searchValue, setSearchValue] = React.useState("")
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setSearchValue(value)
+    onSearchChange?.(value)
+  }
+
+  // Filter children if searchable and searchValue exists
+  const filteredChildren = React.useMemo(() => {
+    if (!searchable || !searchValue) return children
+
+    return React.Children.map(children, (child) => {
+      if (!React.isValidElement(child)) return child
+
+      // // Handle SelectGroup
+      // if (child.type === SelectGroup) {
+      //   const filteredItems = React.Children.map(child.props.children, (item) => {
+      //     if (!React.isValidElement(item)) return item
+      //     if (item.type !== SelectItem) return item
+
+      //     const itemText = item.props.children?.toString().toLowerCase() || ""
+      //     return itemText.includes(searchValue.toLowerCase()) ? item : null
+      //   }).filter(Boolean)
+
+      //   return filteredItems.length > 0
+      //     ? React.cloneElement(child, {}, filteredItems)
+      //     : null
+      // }
+
+      // Handle direct SelectItems
+      if (child.type === SelectItem) {
+        const itemChild = child as React.ReactElement<React.ComponentProps<typeof SelectItem>>
+        const itemText = itemChild.props.children?.toString().toLowerCase() || ""
+        return itemText.includes(searchValue.toLowerCase()) ? child : null
+      }
+    });
+
+  }, [children, searchable, searchValue])
+  
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
@@ -70,6 +119,20 @@ function SelectContent({
         {...props}
       >
         <SelectScrollUpButton />
+        {searchable && (
+          <div className="sticky top-0 z-10 bg-popover p-2">
+            <div className="relative">
+              <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder={searchPlaceholder}
+                value={searchValue}
+                onChange={handleSearchChange}
+                className="w-full rounded-md border bg-transparent py-1.5 pl-9 pr-3 text-sm outline-none focus:ring-2 focus:ring-ring/50"
+              />
+            </div>
+          </div>
+        )}
         <SelectPrimitive.Viewport
           className={cn(
             "p-1",
@@ -77,7 +140,7 @@ function SelectContent({
               "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1"
           )}
         >
-          {children}
+          {filteredChildren}
         </SelectPrimitive.Viewport>
         <SelectScrollDownButton />
       </SelectPrimitive.Content>

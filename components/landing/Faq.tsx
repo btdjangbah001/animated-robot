@@ -3,6 +3,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 export default function FAQ() {
     const faqs = [
         {
+            title: "How to pay & access application forms",
+            description: "1. Navigate to https://register.healthtraining.gov.gh\n\n2. Click on make payment & Register\n3.⁠ ⁠Read the instructions in RED LABEL and complete the form\n4.⁠ ⁠Click on Pay GHS150\n5.⁠ ⁠Select the payment method and input required details, Click Pay Now.\n6.⁠ ⁠PIN & Serial number is sent to the registered email address & phone number\n7.⁠ ⁠Click on continue and input pin and serial to access the form.\n"
+        },
+        {
             title: "What is the Health Training Application Portal?",
             description: "It is an online platform for applying to accredited health training institutions across Ghana, allowing you to complete your application, payment, and follow-up processes online."
         },

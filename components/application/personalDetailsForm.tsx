@@ -27,6 +27,7 @@ interface PersonalDetailsFormProps {
 interface PersonalDetailsState {
   firstName: string;
   lastName: string;
+  isForeigner: boolean | "indeterminate";
   gender: string;
   dob: string;
   birthPlace: string;
@@ -64,6 +65,7 @@ const medicalConditions = [
 const initialFormState: PersonalDetailsState = {
   firstName: "",
   lastName: "",
+  isForeigner: "indeterminate",
   gender: "",
   dob: "",
   birthPlace: "",
@@ -127,6 +129,7 @@ export function PersonalDetailsForm({
   const setError = useApplicationStore((state) => state.setError);
   const disable = application?.registrationStage === "SUBMITTED";
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isForeigner, setIsForeigner] = useState<boolean | "indeterminate">(false);
 
   const fetchRegions = useCallback(async () => {
     setLoadingRegions(true);
@@ -220,6 +223,7 @@ export function PersonalDetailsForm({
       const loadedState: PersonalDetailsState = {
         firstName: app.firstName || "",
         lastName: app.lastName || "",
+        isForeigner: app.isGhanaian ?? "indeterminate",
         gender: app.gender || "",
         dob: app.dateOfBirth
           ? format(new Date(app.dateOfBirth), "yyyy-MM-dd")
@@ -447,6 +451,7 @@ export function PersonalDetailsForm({
       firstName: formState.firstName || "",
       lastName: formState.lastName || "",
       phoneNumber: formState.phone || "",
+      isGhanaian: isForeigner === "indeterminate" ? false : isForeigner,
       email: formState.email || "",
       gender: formState.gender || "",
       dateOfBirth: formState.dob ? new Date(formState.dob).getTime() : 0,
@@ -643,7 +648,7 @@ export function PersonalDetailsForm({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5 md:col-span-2">
+            <div className="space-y-1.5">
               <Label htmlFor="languages">
                 Languages Spoken <span className="text-red-500">*</span>
               </Label>
@@ -657,6 +662,12 @@ export function PersonalDetailsForm({
                 placeholder="e.g. English, Twi"
                 disabled={isLoading || disable}
               />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="languages">
+                Are you a Ghanaian? <span className="text-red-500">*</span>
+              </Label>
+              <Checkbox id="foreigner" checked={isForeigner} onCheckedChange={(checked) => setIsForeigner(checked)} />
             </div>
           </div>
 

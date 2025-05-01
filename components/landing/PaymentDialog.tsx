@@ -118,14 +118,14 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   htmlFor="lastName"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Applicant Surname
+                  Applicant&apos;s Surname
                 </Label>
                 <Input
                   id="lastName"
                   name="lastName"
                   value={paymentData.lastName}
                   onChange={handleChange}
-                  placeholder="Enter your last name"
+                  placeholder="Enter applicant's last name"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                 />
@@ -135,14 +135,14 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   htmlFor="firstName"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Applicant Other Names
+                  Applicant&apos;s Other Names
                 </Label>
                 <Input
                   id="firstName"
                   name="firstName"
                   value={paymentData.firstName}
                   onChange={handleChange}
-                  placeholder="Enter your given names"
+                  placeholder="Enter applicant's given names"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                 />
@@ -153,7 +153,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   htmlFor="email"
                   className="text-sm font-medium text-gray-700"
                 >
-                  Email
+                 Applicant&apos;s Email
                 </Label>
                 <Input
                   id="email"
@@ -161,7 +161,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   type="email"
                   value={paymentData.email}
                   onChange={handleChange}
-                  placeholder="Enter your email address"
+                  placeholder="Enter applicant's email address"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
                 />

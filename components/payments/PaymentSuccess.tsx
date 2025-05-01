@@ -1,14 +1,16 @@
 import React from 'react';
-
+import Image from 'next/image';
 interface PaymentSuccessProps {
   pin: string;
   serialNumber: string;
+  invoiceNumber: string; // prop for invoice number
   onContinue?: () => void; // New prop for continue action
 }
 
 const PaymentSuccess: React.FC<PaymentSuccessProps> = ({
   pin,
   serialNumber,
+  invoiceNumber,
   onContinue = () => window.location.href = '/dashboard' // Default redirect
 }) => {
   return (
@@ -29,7 +31,7 @@ const PaymentSuccess: React.FC<PaymentSuccessProps> = ({
       }}>
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           {/* Optional: Add your logo here */}
-          {/* <img src="your-logo.png" alt="Company Logo" style={{ maxWidth: '100px' }} /> */}
+          <Image src="/logo.png" alt="Ministry of Health Logo" width={60} height={60}className="mr-4" />
         </div>
         
         <div style={{
@@ -46,7 +48,7 @@ const PaymentSuccess: React.FC<PaymentSuccessProps> = ({
           marginBottom: '10px',
         }}>Payment Successful!</h1>
         
-        <p>Thank you for your payment. Your transaction has been processed successfully, and your <strong>PIN</strong> and <strong>Serial Number</strong> have been generated.</p>
+        <p>Your payment with invoice number <strong>{invoiceNumber}</strong> has been processed successfully. Below is your generated <strong>PIN</strong> and <strong>Serial Number</strong></p>
         
         <div style={{
           background: '#f5f5f5',

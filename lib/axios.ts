@@ -13,7 +13,8 @@ const nonAuthEndpoints: string[] = [
     '/api/v1.0/public/make-payment',
     '/api/v1.0/public/check-status',
     '/api/v1.0/portal/login',
-    '/api/v1.0/dashboard'
+    '/api/v1.0/dashboard',
+    '/api/v1.0/public/settings',
 ];
 
 const axiosInstance = axios.create({

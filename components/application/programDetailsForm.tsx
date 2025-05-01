@@ -255,7 +255,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
                     }
                   />{" "}
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent searchable searchPlaceholder="Search options...">
                   {isLoadingInstitutions ? (
                     <SelectItem value="loading" disabled>
                       Loading...
@@ -295,7 +295,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
                     }
                   />{" "}
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent searchable searchPlaceholder="Search options...">
                   {isLoadingPrograms ? (
                     <SelectItem value="loading" disabled>
                       Loading...

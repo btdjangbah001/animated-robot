@@ -57,6 +57,7 @@ export interface ContactInformationData {
 }
 
 export interface ApplicantOutput {
+    isGhanaian: boolean | null;
     id: number;
     firstName: string | null;
     middleName: string | null;
@@ -137,6 +138,11 @@ export interface ApplicationOutput {
     applicationPin?: string | null;
     status: "PENDING" | "APPROVED" | "REJECTED" | "IN_REVIEW" | "NEW" | "FAILED_ELIGIBILITY" | "PASSED_ELIGIBILITY" | "INTERVIEW_SCHEDULED" | null;
     aggregateGrade?: number | string | null;
+}
+
+export interface SettingsOutput {
+    startingDate: number;
+    closingDate: number;
 }
 
 export type ApplicantData = ApplicantOutput;

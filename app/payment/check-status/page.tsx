@@ -59,7 +59,7 @@ export default function CheckStatusPage() {
 
   const statusTemplate = (status: string) => {
     if (status === "PAID") {
-      return <PaymentSuccess pin={applicant?.pin ?? ''} serialNumber={applicant?.serialNumber ?? ''} onContinue={handleOkClick} />;
+      return <PaymentSuccess pin={applicant?.pin ?? ''} serialNumber={applicant?.serialNumber ?? ''} invoiceNumber={invoiceNumber ?? ''} onContinue={handleOkClick} />;
     }
     if (status === "FAILED") {
       return <PaymentFailed errorMessage={'Payment could not be processed'} onRetry={handleTryAgainClick} />;

@@ -1,14 +1,15 @@
 "use client";
 import * as React from "react";
-import {Eye, EyeOff, Loader2} from "lucide-react";
-import {useRouter} from 'next/navigation';
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useRouter } from 'next/navigation';
 import useAuthStore from '@/store/authStore';
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardHeader, CardTitle,} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {AxiosError} from "axios";
-import {toast} from "react-toastify";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AxiosError } from "axios";
+import { toast } from "react-toastify";
+import Image from 'next/image';
 
 export const Login = () => {
     const [pin, setPin] = React.useState("");
@@ -43,7 +44,6 @@ export const Login = () => {
             } else if (err instanceof Error) {
                 errorMessage = err.message;
             }
-            setError(errorMessage);
             toast.error(errorMessage);
         }
     };
@@ -51,12 +51,19 @@ export const Login = () => {
     return (
         <Card className="w-full max-w-lg mx-auto">
             <CardHeader className="p-6 pb-4">
-                <div className="mb-4">
+                <div className="flex items-center justify-center mb-4">
+                    <Image
+                        src="/logo.png"
+                        alt="Ministry of Health Logo"
+                        width={60}
+                        height={60}
+                        className="mr-4"
+                    />
                     <span className="inline-block px-3 py-1 text-sm font-medium rounded-md bg-green-100 text-green-800">
                         MOH
                     </span>
                 </div>
-                <CardTitle className="text-2xl font-semibold text-gray-900">
+                <CardTitle className="text-2xl font-semibold text-gray-900 text-center">
                     Application Portal
                 </CardTitle>
             </CardHeader>
@@ -121,6 +128,14 @@ export const Login = () => {
                         ) : (
                             'Submit'
                         )}
+                    </Button>
+
+                    <Button
+                        variant="link"
+                        className="w-full text-gray-600 hover:text-gray-900 cursor-pointer"
+                        onClick={() => router.replace('/dashboard')}
+                    >
+                        Go to Dashboard
                     </Button>
                 </form>
             </CardContent>

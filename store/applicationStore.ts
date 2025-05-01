@@ -1,7 +1,7 @@
 import {create} from 'zustand';
 import axiosInstance from '@/lib/axios';
 import {AxiosError} from 'axios';
-import {ApplicantOutput, ApplicationOutput, SubjectOutput} from "@/types/applicant";
+import {ApplicantOutput, ApplicationOutput, SettingsOutput, SubjectOutput} from "@/types/applicant";
 import {ApplicantInput, ApplicationInput} from "@/types/application";
 
 interface OptionType {
@@ -26,6 +26,7 @@ interface ApplicationState {
     isLoadingWaecCourses: boolean;
     coreSubjectsOptions: SubjectOutput[];
     isLoadingCoreSubjects: boolean;
+    settings: SettingsOutput | null;
 }
 
 interface ApplicationActions {
@@ -36,6 +37,7 @@ interface ApplicationActions {
     setLoading: (isLoading: boolean) => void;
     setError: (error: string | null) => void;
     clearApplication: () => void;
+    fetchSettings: () => Promise<void>;
     // New actions for dropdowns
     fetchProgramTypes: () => Promise<void>;
     fetchInstitutions: (programTypeId: number | string) => Promise<void>;
@@ -64,6 +66,7 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
     isLoadingWaecCourses: false,
     coreSubjectsOptions: [],
     isLoadingCoreSubjects: false,
+    settings: null,
 
     setLoading: (isLoading) => set({ isLoading }),
     setError: (error) => set({ error }),
@@ -87,6 +90,21 @@ const useApplicationStore = create<ApplicationStore>((set, get) => ({
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (error) {
             set({ isLoading: false, error: "Failed to load application data.", application: null, applicationId: null });
+        }
+    },
+
+    fetchSettings: async () => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await axiosInstance.get<SettingsOutput>('/api/v1.0/public/settings');
+            const appData = response.data;
+            set({
+                settings: appData,
+                isLoading: false,
+            });
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            set({ isLoading: false, error: "Failed to load settings data.", settings: null });
         }
     },
 

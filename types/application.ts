@@ -25,6 +25,7 @@ export interface ApplicantInput {
   profilePhotoId?: number | null;
   contactInformation?: ContactInformationInput | null;
   ghanaCardPhotoId?: string | null;
+  isGhanaian?: boolean | null;
 }
 
 export interface CoreResultInput {

@@ -59,8 +59,8 @@ interface AcademicDetailsFormProps {
   onBack: () => void;
 }
 
-const wassceGradeOptions = ["A1", "B2", "B3", "C4", "C5", "C6"];
-const ssceGradeOptions = ["A","B","C","D"];
+const wassceGradeOptions = ["A1", "B2", "B3", "C4", "C5", "C6", "D7", "E8"];
+const ssceGradeOptions = ["A","B","C","D", "E"];
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: 20 }, (_, i) =>
   (currentYear - i).toString(),
