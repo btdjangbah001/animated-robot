@@ -65,7 +65,7 @@ const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: 20 }, (_, i) =>
   (currentYear - i).toString(),
 );
-const monthOptions = ["May/June", "Nov/Dec"];
+const monthOptions = ["May/June", "Aug/Sept", "Nov/Dec"];
 
 export function AcademicDetailsForm({
   onNext,
