@@ -1,19 +1,18 @@
 "use client";
-import {FormEvent, useEffect, useState} from "react";
-import {ArrowLeft, ArrowRight, Loader2, PlusCircle, Trash2,} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardDescription, CardHeader, CardTitle,} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {Label} from "@/components/ui/label";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
-import {Separator} from "@/components/ui/separator";
+import { FormEvent, useEffect, useState } from "react";
+import { ArrowLeft, ArrowRight, Loader2, PlusCircle, Trash2, } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import axiosInstance from "@/lib/axios";
 import useApplicationStore from "@/store/applicationStore";
-import {AcademicProfileInput, ApplicationInput, CoreResultInput, ElectiveResultInput, WorkExperienceInput,} from "@/types/application";
-import {SubjectOutput} from "@/types/applicant";
-import {toast} from "react-toastify";
-import {mapStageToStepId} from "@/lib/consts";
-import {areCoreResultsEqual, areElectivesResultsEqual} from "@/lib/utils";
+import { AcademicProfileInput, ApplicationInput, CoreResultInput, ElectiveResultInput, WorkExperienceInput, } from "@/types/application";
+import { SubjectOutput } from "@/types/applicant";
+import { toast } from "react-toastify";
+import { mapStageToStepId } from "@/lib/consts";
 import { Alert, AlertTitle } from "@mui/material";
 
 interface ElectiveSubjectLocal {
@@ -60,7 +59,7 @@ interface AcademicDetailsFormProps {
 }
 
 const wassceGradeOptions = ["A1", "B2", "B3", "C4", "C5", "C6", "D7", "E8"];
-const ssceGradeOptions = ["A","B","C","D", "E"];
+const ssceGradeOptions = ["A", "B", "C", "D", "E"];
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: 20 }, (_, i) =>
   (currentYear - i).toString(),
@@ -124,8 +123,8 @@ export function AcademicDetailsForm({
   };
 
   useEffect(() => {
-    if (waecCourses.length === 0) fetchWaecCourses().then(() => {});
-    if (coreSubjectsOptions.length === 0) fetchCoreSubjects().then(() => {});
+    if (waecCourses.length === 0) fetchWaecCourses().then(() => { });
+    if (coreSubjectsOptions.length === 0) fetchCoreSubjects().then(() => { });
   }, [
     fetchWaecCourses,
     fetchCoreSubjects,
@@ -150,19 +149,19 @@ export function AcademicDetailsForm({
         subjectOptions: [],
         loadingSubjects: false,
       })) || [
-        {
-          id: crypto.randomUUID(),
-          dbId: null,
-          waecCourseId: "",
-          subjectId: "",
-          grade: "",
-          indexNumber: "",
-          examYear: "",
-          examMonth: "",
-          subjectOptions: [],
-          loadingSubjects: false,
-        },
-      ];
+          {
+            id: crypto.randomUUID(),
+            dbId: null,
+            waecCourseId: "",
+            subjectId: "",
+            grade: "",
+            indexNumber: "",
+            examYear: "",
+            examMonth: "",
+            subjectOptions: [],
+            loadingSubjects: false,
+          },
+        ];
       setElectiveSubjects(electivesFromStore);
 
       const coresFromStore = coreSubjectsOptions.map((coreOpt) => {
@@ -179,7 +178,14 @@ export function AcademicDetailsForm({
           examMonth: savedResult?.month || "",
         };
       });
-      setCoreSubjects(coresFromStore);
+      if (electivesFromStore.length > 3) {
+        const newItems = [...coresFromStore];
+        newItems.pop()
+        setCoreSubjects(newItems);
+      }
+      else {
+        setCoreSubjects(coresFromStore);
+      }
 
       const workExperiencesFromStore = application.workExperiences?.map((work) => ({
         id: work.id?.toString() ?? crypto.randomUUID(),
@@ -202,7 +208,7 @@ export function AcademicDetailsForm({
       electivesFromStore.forEach((elective) => {
         if (elective.waecCourseId) {
           handleWaecCourseChange(elective.id, elective.waecCourseId, true).then(
-            () => {},
+            () => { },
           );
         }
       });
@@ -232,12 +238,12 @@ export function AcademicDetailsForm({
       prev.map((s) =>
         s.id === rowId
           ? {
-              ...s,
-              waecCourseId: courseIdStr,
-              subjectId: isPrefill ? s.subjectId : "",
-              subjectOptions: [],
-              loadingSubjects: true,
-            }
+            ...s,
+            waecCourseId: courseIdStr,
+            subjectId: isPrefill ? s.subjectId : "",
+            subjectOptions: [],
+            loadingSubjects: true,
+          }
           : s,
       ),
     );
@@ -298,6 +304,7 @@ export function AcademicDetailsForm({
       },
     ]);
   };
+
   const removeSubjectRow = (id: string) => {
     setElectiveSubjects((prev) => prev.filter((s) => s.id !== id));
     if (electiveSubjects.length < 5) {
@@ -318,6 +325,7 @@ export function AcademicDetailsForm({
       setCoreSubjects(coresFromStore);
     }
   };
+
   const handleCoreSubjectChange = (
     localId: string,
     field: keyof Omit<CoreSubjectLocal, "id" | "subjectName" | "subjectId">,
@@ -369,6 +377,7 @@ export function AcademicDetailsForm({
       prev.map((s) => (s.id === id ? { ...s, [field]: value } : s)),
     );
   };
+
   const addWorkExperienceRow = () => {
 
     setWorkExperience((prev) => [
@@ -382,6 +391,7 @@ export function AcademicDetailsForm({
       },
     ]);
   };
+
   const removeWorkExperienceRow = (id: string) => {
     setWorkExperience((prev) => prev.filter((s) => s.id !== id));
   };
@@ -389,7 +399,7 @@ export function AcademicDetailsForm({
   function hasDuplicates(arr: ElectiveSubjectLocal[]): boolean {
     const seen = new Set();
     for (const obj of arr) {
-      const key = JSON.stringify(obj.id);
+      const key = JSON.stringify(obj.subjectId);
       if (seen.has(key)) {
         return true;
       }
@@ -401,12 +411,7 @@ export function AcademicDetailsForm({
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (disable){
-      onNext();
-      return;
-    }
-
-    if (disable){
+    if (disable) {
       onNext();
       return;
     }
@@ -416,7 +421,7 @@ export function AcademicDetailsForm({
       return;
     }
 
-    if (hasDuplicates(electiveSubjects)){
+    if (hasDuplicates(electiveSubjects)) {
       toast.error("You can not use the same elective subject more than once.");
       return;
     }
@@ -429,7 +434,7 @@ export function AcademicDetailsForm({
       indexNumbers.add(subject.indexNumber)
     })
 
-    if (indexNumbers.size > 3){
+    if (indexNumbers.size > 3) {
       toast.error(`You can not use grades from more than 3 certificates. But your form shows ${indexNumbers.size} different index numbers.`)
       return;
     }
@@ -481,14 +486,12 @@ export function AcademicDetailsForm({
         endDate: new Date(s.endDate).getTime(),
       }));
 
-    const examsTypeIsDirty = applicationType != application?.examinationType;
-    if (!examsTypeIsDirty
-        && areCoreResultsEqual(mappedCoreResults, application?.coreResults ?? [])
-        && areElectivesResultsEqual(mappedElectiveResults, application?.electiveResults ?? [])
-    ){
-      onNext();
-      return;
-    }
+    // if (areCoreResultsEqual(mappedCoreResults, application?.coreResults ?? [])
+    //   && areElectivesResultsEqual(mappedElectiveResults, application?.electiveResults ?? [])
+    // ) {
+    //   onNext();
+    //   return;
+    // }
 
     const electivesComplete = electiveSubjects.every(
       (s) =>
@@ -503,21 +506,35 @@ export function AcademicDetailsForm({
       (s) => s.grade && s.indexNumber && s.examYear && s.examMonth,
     );
 
+    const totalSubjects = electiveSubjects.length + coreSubjects.length;
+    console.log(totalSubjects);
+    if (totalSubjects > 6) {
+      toast.error("You can not use more than 6 subjects.");
+      return;
+    }
+
     if (!isPostBasic && (!electivesComplete || !coresComplete)) {
       toast.error("Please fill required fields (Grade, Index, Year, Month) for every subject.");
       return;
     }
 
+    if (isPostBasic && (!mappedProfiles || !mappedExperiences)) {
+      toast.error("Post Basic courses require at least one academic profile and one work experience.");
+      return;
+    }
+
     const payload: Partial<ApplicationInput> = {
-      examinationType: applicationType,
-      electiveResults: mappedElectiveResults,
-      academicProfiles: mappedProfiles, 
-      workExperiences: mappedExperiences,
-      coreResults: mappedCoreResults,
-          registrationStage: mapStageToStepId(application?.registrationStage ?? "ACADEMIC_DETAILS") <= mapStageToStepId("ACADEMIC_DETAILS")
-              ? "PERSONAL_DETAILS"
-              :  application?.registrationStage,
+      examinationType: isPostBasic ? null : applicationType,
+      electiveResults: isPostBasic ? [] : mappedElectiveResults,
+      academicProfiles: isPostBasic ? mappedProfiles : [],
+      workExperiences: isPostBasic ? mappedExperiences : [],
+      coreResults: isPostBasic ? [] : mappedCoreResults,
+      registrationStage: mapStageToStepId(application?.registrationStage ?? "ACADEMIC_DETAILS") <= mapStageToStepId("ACADEMIC_DETAILS")
+        ? "PERSONAL_DETAILS"
+        : application?.registrationStage,
     };
+
+    console.log(payload);
 
     const success = await updateApplication(payload);
     if (success) {
@@ -539,7 +556,7 @@ export function AcademicDetailsForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-8">
-          { !isPostBasic && <div className="space-y-1.5 max-w-sm">
+          {!isPostBasic && <div className="space-y-1.5 max-w-sm">
             <Label htmlFor="application-type">
               Application Type <span className="text-red-500">*</span>
             </Label>
@@ -558,9 +575,9 @@ export function AcademicDetailsForm({
               </SelectContent>
             </Select>
           </div>}
-          { !isPostBasic && <Separator />}
+          {!isPostBasic && <Separator />}
 
-          { !isPostBasic &&<div className="space-y-6">
+          {!isPostBasic && <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-1">
                 Provide the following information
@@ -838,10 +855,10 @@ export function AcademicDetailsForm({
             </div>}
           </div>}
 
-          { isPostBasic && <div className="space-y-6">
+          {isPostBasic && <div className="space-y-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                Provide the following information
-              </h3>
+              Provide the following information
+            </h3>
             <div>
               <h4 className="text-base font-semibold text-gray-700 mb-1">
                 Academic Profiles
@@ -862,7 +879,7 @@ export function AcademicDetailsForm({
                   className="border-b border-gray-200 pb-5 last:border-b-0 last:pb-0"
                 >
                   <div className="grid grid-cols-2 lg:grid-cols-[1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-4 items-stretch">
-                  <div className="space-y-1.5">
+                    <div className="space-y-1.5">
                       <Label
                         htmlFor={`institutionAttended-${academicProfile.id}`}
                         className="text-sm font-medium text-gray-600 lg:hidden"
@@ -977,7 +994,7 @@ export function AcademicDetailsForm({
                 </div>
               ))}
             </div>
-            {academicProfiles.length < 4 && <div className="pt-2">
+            {<div className="pt-2">
               <Button
                 type="button"
                 variant="outline"
@@ -1010,7 +1027,7 @@ export function AcademicDetailsForm({
                   className="border-b border-gray-200 pb-5 last:border-b-0 last:pb-0"
                 >
                   <div className="grid grid-cols-2 lg:grid-cols-[1.5fr_1.5fr_1fr_1fr_1.5fr_auto] gap-4 items-stretch">
-                  <div className="space-y-1.5">
+                    <div className="space-y-1.5">
                       <Label
                         htmlFor={`institutionAttended-${experience.id}`}
                         className="text-sm font-medium text-gray-600 lg:hidden"
@@ -1103,7 +1120,7 @@ export function AcademicDetailsForm({
                       />
                     </div>
                     <div className="flex justify-end items-end col-span-2 lg:col-span-1">
-                      {academicProfiles.length > 1 && (
+                      {workExperience.length > 1 && (
                         <Button
                           type="button"
                           variant="ghost"
@@ -1117,7 +1134,7 @@ export function AcademicDetailsForm({
                           <Trash2 className="h-4 w-4" />{" "}
                         </Button>
                       )}
-                      {academicProfiles.length <= 1 && (
+                      {workExperience.length <= 1 && (
                         <div className="h-9 w-9"></div>
                       )}
                     </div>
@@ -1125,7 +1142,7 @@ export function AcademicDetailsForm({
                 </div>
               ))}
             </div>
-            {academicProfiles.length < 4 && <div className="pt-2">
+            {<div className="pt-2">
               <Button
                 type="button"
                 variant="outline"
@@ -1141,7 +1158,7 @@ export function AcademicDetailsForm({
 
           <Separator />
 
-          { !isPostBasic &&<div className="space-y-6">
+          {!isPostBasic && <div className="space-y-6">
             <div>
               <h4 className="text-base font-semibold text-gray-700 mb-1">
                 Core Subjects
@@ -1164,137 +1181,7 @@ export function AcademicDetailsForm({
                   Loading core subjects...
                 </div>
               )}
-              {coreSubjects.map((subject) => subject.subjectName === 'Science' && electiveSubjects.length < 3 ? (
-                <div
-                key={subject.id}
-                className="border-b border-gray-200 pb-5 last:border-b-0 last:pb-0"
-              >
-                <div className="grid grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.5fr] gap-4 items-stretch">
-                  <div className="space-y-1.5 col-span-2 lg:col-span-1">
-                    {" "}
-                    <Label className="text-sm font-medium text-gray-600 lg:hidden">
-                      Subject
-                    </Label>{" "}
-                    <div className="h-10 flex items-center px-3 text-sm text-gray-800 font-medium">
-                      {subject.subjectName}
-                    </div>{" "}
-                  </div>
-                  <div className="space-y-1.5">
-                    {" "}
-                    <Label
-                      htmlFor={`core-grade-${subject.id}`}
-                      className="text-sm font-medium text-gray-600 lg:hidden"
-                    >
-                      Grade
-                    </Label>{" "}
-                    <Select
-                      value={subject.grade}
-                      onValueChange={(value) =>
-                        handleCoreSubjectChange(subject.id, "grade", value)
-                      }
-                      disabled={isLoading || disable}
-                    >
-                      <SelectTrigger
-                        id={`core-grade-${subject.id}`}
-                        className="w-full focus:ring-green-500"
-                      >
-                        <SelectValue placeholder="Grade" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {gradeOptionsToUse.map((opt) => (
-                          <SelectItem key={opt} value={opt}>
-                            {opt}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>{" "}
-                  </div>
-                  <div className="space-y-1.5">
-                    {" "}
-                    <Label
-                      htmlFor={`core-indexNumber-${subject.id}`}
-                      className="text-sm font-medium text-gray-600 lg:hidden"
-                    >
-                      Index Number
-                    </Label>{" "}
-                    <Input
-                      id={`core-indexNumber-${subject.id}`}
-                      type="text"
-                      placeholder="Index No."
-                      value={subject.indexNumber}
-                      onChange={(e) =>
-                        handleCoreSubjectChange(
-                          subject.id,
-                          "indexNumber",
-                          e.target.value,
-                        )
-                      }
-                      disabled={isLoading || disable}
-                      className="w-full focus:ring-green-500"
-                    />{" "}
-                  </div>
-                  <div className="space-y-1.5 col-span-2 lg:col-span-1">
-                    {" "}
-                    <Label className="text-sm font-medium text-gray-600 lg:hidden">
-                      Exam Date <span className="text-red-500">*</span>
-                    </Label>{" "}
-                    <div className="grid grid-cols-2 gap-2">
-                      {" "}
-                      <Select
-                        value={subject.examYear}
-                        onValueChange={(value) =>
-                          handleCoreSubjectChange(
-                            subject.id,
-                            "examYear",
-                            value,
-                          )
-                        }
-                        disabled={isLoading || disable}
-                      >
-                        <SelectTrigger
-                          aria-label="Core Exam Year"
-                          className="w-full focus:ring-green-500"
-                        >
-                          <SelectValue placeholder="Year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {yearOptions.map((opt) => (
-                            <SelectItem key={opt} value={opt}>
-                              {opt}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>{" "}
-                      <Select
-                        value={subject.examMonth}
-                        onValueChange={(value) =>
-                          handleCoreSubjectChange(
-                            subject.id,
-                            "examMonth",
-                            value,
-                          )
-                        }
-                        disabled={isLoading || disable}
-                      >
-                        <SelectTrigger
-                          aria-label="Core Exam Month"
-                          className="w-full focus:ring-green-500"
-                        >
-                          <SelectValue placeholder="Month" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {monthOptions.map((opt) => (
-                            <SelectItem key={opt} value={opt}>
-                              {opt}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>{" "}
-                    </div>{" "}
-                  </div>
-                </div>
-              </div>
-              ) : (
+              {coreSubjects.map((subject) =>
                 <div
                   key={subject.id}
                   className="border-b border-gray-200 pb-5 last:border-b-0 last:pb-0"
@@ -1424,11 +1311,11 @@ export function AcademicDetailsForm({
                     </div>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </div>}
 
-          { !isPostBasic &&<Separator className="my-8" />}
+          {!isPostBasic && <Separator className="my-8" />}
 
           <div className="flex justify-between">
             <Button
