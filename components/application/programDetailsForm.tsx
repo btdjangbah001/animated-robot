@@ -1,14 +1,14 @@
 "use client";
-import React, {FormEvent, useEffect, useState} from "react";
-import {ArrowRight, Loader2} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Label} from "@/components/ui/label";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
+import React, { FormEvent, useEffect, useState } from "react";
+import { ArrowRight, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select";
 import useApplicationStore from "@/store/applicationStore";
-import {ApplicationInput} from "@/types/application";
-import {mapStageToStepId} from "@/lib/consts";
-import {toast} from "react-toastify";
+import { ApplicationInput } from "@/types/application";
+import { mapStageToStepId } from "@/lib/consts";
+import { toast } from "react-toastify";
 
 interface ProgramDetailsFormProps {
   onNext: () => void;
@@ -36,6 +36,9 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
   const updateApplication = useApplicationStore(
     (state) => state.updateApplication,
   );
+  // const updateApplicantDetails = useApplicationStore(
+  //   (state) => state.updateApplicantDetails,
+  // );
   const isLoading = useApplicationStore((state) => state.isLoading);
   const error = useApplicationStore((state) => state.error);
   const programTypes = useApplicationStore((state) => state.programTypes);
@@ -66,8 +69,8 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
   const clearPrograms = useApplicationStore((state) => state.clearPrograms);
 
   useEffect(() => {
-    if (!application && !isLoading && !error) fetchApplication().then(() => {});
-    if (programTypes.length === 0) fetchProgramTypes().then(() => {});
+    if (!application && !isLoading && !error) fetchApplication().then(() => { });
+    if (programTypes.length === 0) fetchProgramTypes().then(() => { });
   }, [
     fetchProgramTypes,
     programTypes.length,
@@ -139,7 +142,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
-    if (disable){
+    if (disable) {
       onNext();
       return;
     }
@@ -167,13 +170,23 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
       return;
     }
 
+    // const applicantPayload: ApplicantInput = {
+    //   isGhanaian: isForeigner === "indeterminate" ? false : isForeigner,
+    // };
+
     const payload: Partial<ApplicationInput> = {
       institutionId: Number(selectedInstitutionId),
       programId: Number(selectedProgramId),
       registrationStage: mapStageToStepId(application?.registrationStage ?? "PROGRAM_DETAILS") <= mapStageToStepId("PROGRAM_DETAILS")
-          ? "ACADEMIC_DETAILS"
-          :  application?.registrationStage,
+        ? "ACADEMIC_DETAILS"
+        : application?.registrationStage,
     };
+
+    // const succ = await updateApplicantDetails(applicantPayload);
+    // if (!succ) {
+    //   toast.error("Could not update applicant details")
+    //   return;
+    // }
 
     const success = await updateApplication(payload);
     if (success) {
@@ -198,6 +211,12 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-6">
+            {/* <div className="space-y-2">
+              <Label htmlFor="foreigner">
+                Are you a Foriegner? Check this box if you a not a Ghanaian. <span className="text-red-500">*</span>
+              </Label>
+              <Checkbox id="foreigner" checked={isForeigner} onCheckedChange={(checked) => setIsForeigner(checked)} />
+            </div> */}
             <div className="space-y-2">
               <Label htmlFor="program-type">
                 Program Type <span className="text-red-500">*</span>

@@ -13,7 +13,6 @@ import { AcademicProfileInput, ApplicationInput, CoreResultInput, ElectiveResult
 import { SubjectOutput } from "@/types/applicant";
 import { toast } from "react-toastify";
 import { mapStageToStepId } from "@/lib/consts";
-import { Alert, AlertTitle } from "@mui/material";
 
 interface ElectiveSubjectLocal {
   id: string;
@@ -136,7 +135,22 @@ export function AcademicDetailsForm({
     if (application && coreSubjectsOptions.length > 0) {
       setIsPostBasic(application.program?.programType?.postBasic ?? false);
       setApplicationType(application.examinationType || "WASSCE");
+      const coresFromStore = coreSubjectsOptions.map((coreOpt) => {
+        const savedResult = application.coreResults?.find(
+          (res) => res.subjectId === coreOpt.id,
+        );
+        return {
+          id: `core-${coreOpt.id}`,
+          subjectId: coreOpt.id,
+          subjectName: coreOpt.name || "Unknown Core Subject",
+          grade: savedResult?.grade || "",
+          indexNumber: savedResult?.indexNumber || "",
+          examYear: savedResult?.year?.toString() || "",
+          examMonth: savedResult?.month || "",
+        };
+      });
 
+      // const filteredData = application.electiveResults?.filter(item => item.subjectId !== 35);
       const electivesFromStore = application.electiveResults?.map((res) => ({
         id: res.id?.toString() ?? crypto.randomUUID(),
         dbId: res.id ?? null,
@@ -164,20 +178,6 @@ export function AcademicDetailsForm({
         ];
       setElectiveSubjects(electivesFromStore);
 
-      const coresFromStore = coreSubjectsOptions.map((coreOpt) => {
-        const savedResult = application.coreResults?.find(
-          (res) => res.subjectId === coreOpt.id,
-        );
-        return {
-          id: `core-${coreOpt.id}`,
-          subjectId: coreOpt.id,
-          subjectName: coreOpt.name || "Unknown Core Subject",
-          grade: savedResult?.grade || "",
-          indexNumber: savedResult?.indexNumber || "",
-          examYear: savedResult?.year?.toString() || "",
-          examMonth: savedResult?.month || "",
-        };
-      });
       if (electivesFromStore.length > 3) {
         const newItems = [...coresFromStore];
         newItems.pop()
@@ -186,6 +186,15 @@ export function AcademicDetailsForm({
       else {
         setCoreSubjects(coresFromStore);
       }
+
+      electivesFromStore.forEach((elective) => {
+        if (elective.waecCourseId) {
+          handleWaecCourseChange(elective.id, elective.waecCourseId, true).then(
+            () => { },
+          );
+        }
+      });
+
 
       const workExperiencesFromStore = application.workExperiences?.map((work) => ({
         id: work.id?.toString() ?? crypto.randomUUID(),
@@ -204,14 +213,6 @@ export function AcademicDetailsForm({
         endDate: getSafeDateString(profile.endDate) ?? "",
       }));
       setAcademicProfiles(academicProfilesFromStore ?? []);
-
-      electivesFromStore.forEach((elective) => {
-        if (elective.waecCourseId) {
-          handleWaecCourseChange(elective.id, elective.waecCourseId, true).then(
-            () => { },
-          );
-        }
-      });
     }
   }, [application, coreSubjectsOptions]);
 
@@ -585,12 +586,12 @@ export function AcademicDetailsForm({
               <CardDescription className="mb-4 text-sm">
                 Note: You can not use grades from more than 3 certificates.
               </CardDescription>
-              <CardDescription className="mb-4 text-sm">
+              {/* {!application?.applicant?.isGhanaian && <CardDescription className="mb-4 text-sm">
                 <Alert variant="filled" severity="error" className="mb-4">
                   <AlertTitle>Attention Science & Home Economics Students:</AlertTitle>
                   You may replace Integrated Science with either <strong>Biology</strong> or <strong>Additional Mathematics</strong> by additional elective subjects.
                 </Alert>
-              </CardDescription>
+              </CardDescription>} */}
               <h4 className="text-base font-semibold text-gray-700 mb-1">
                 Elective Subjects
               </h4>
@@ -639,14 +640,19 @@ export function AcademicDetailsForm({
                               Loading...
                             </SelectItem>
                           ) : (
-                            waecCourses.map((opt) => (
-                              <SelectItem
-                                key={opt.id}
-                                value={opt.id.toString()}
-                              >
-                                {opt.title}
-                              </SelectItem>
-                            ))
+                            waecCourses.map((opt) => {
+                              if (application?.program?.programType?.title !== 'Certificate' && opt.id === 5) {
+                                return
+                              }
+                              return (
+                                <SelectItem
+                                  key={opt.id}
+                                  value={opt.id.toString()}
+                                >
+                                  {opt.title}
+                                </SelectItem>
+                              );
+                            })
                           )}
                         </SelectContent>
                       </Select>
@@ -729,11 +735,16 @@ export function AcademicDetailsForm({
                           <SelectValue placeholder="Grade" />
                         </SelectTrigger>
                         <SelectContent>
-                          {gradeOptionsToUse.map((opt) => (
-                            <SelectItem key={opt} value={opt}>
-                              {opt}
-                            </SelectItem>
-                          ))}
+                          {gradeOptionsToUse.map((opt) => {
+                            if (application?.program?.programType?.title !== 'Certificate' && (opt === 'D7' || opt === 'E8' || opt === 'E')) {
+                              return
+                            }
+                            return (
+                              <SelectItem key={opt} value={opt}>
+                                {opt}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>
                     </div>
@@ -840,7 +851,20 @@ export function AcademicDetailsForm({
                 </div>
               ))}
             </div>
-            {electiveSubjects.length < 4 && <div className="pt-2">
+            {/* {!application?.applicant?.isGhanaian && electiveSubjects.length < 4 && <div className="pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="text-green-700 border-green-300 bg-green-50 hover:bg-green-100 hover:text-green-800 hover:border-green-400"
+                onClick={addSubjectRow}
+                disabled={isLoading || disable}
+              >
+                {" "}
+                <PlusCircle className="mr-2 h-4 w-4" /> Add Elective
+                Subject{" "}
+              </Button>
+            </div>} */}
+            {electiveSubjects.length < 3 && <div className="pt-2">
               <Button
                 type="button"
                 variant="outline"
@@ -1218,11 +1242,16 @@ export function AcademicDetailsForm({
                           <SelectValue placeholder="Grade" />
                         </SelectTrigger>
                         <SelectContent>
-                          {gradeOptionsToUse.map((opt) => (
-                            <SelectItem key={opt} value={opt}>
-                              {opt}
-                            </SelectItem>
-                          ))}
+                          {gradeOptionsToUse.map((opt) => {
+                            if (application?.program?.programType?.title !== 'Certificate' && (opt === 'D7' || opt === 'E8' || opt === 'E')) {
+                              return
+                            }
+                            return (
+                              <SelectItem key={opt} value={opt}>
+                                {opt}
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
                       </Select>{" "}
                     </div>

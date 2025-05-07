@@ -129,7 +129,6 @@ export function PersonalDetailsForm({
   const setError = useApplicationStore((state) => state.setError);
   const disable = application?.registrationStage === "SUBMITTED";
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isForeigner, setIsForeigner] = useState<boolean | "indeterminate">(false);
 
   const fetchRegions = useCallback(async () => {
     setLoadingRegions(true);
@@ -451,7 +450,6 @@ export function PersonalDetailsForm({
       firstName: formState.firstName || "",
       lastName: formState.lastName || "",
       phoneNumber: formState.phone || "",
-      isGhanaian: isForeigner === "indeterminate" ? false : isForeigner,
       email: formState.email || "",
       gender: formState.gender || "",
       dateOfBirth: formState.dob ? new Date(formState.dob).getTime() : 0,
@@ -663,12 +661,12 @@ export function PersonalDetailsForm({
                 disabled={isLoading || disable}
               />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="languages">
+            {/* <div className="space-y-1.5">
+              <Label htmlFor="foreigner">
                 Are you a Ghanaian? <span className="text-red-500">*</span>
               </Label>
-              <Checkbox id="foreigner" checked={isForeigner} onCheckedChange={(checked) => setIsForeigner(checked)} />
-            </div>
+              <Checkbox id="foreigner" checked={formState.isForeigner} />
+            </div> */}
           </div>
 
           <div className="space-y-3 pt-4">
