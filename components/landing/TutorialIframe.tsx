@@ -8,7 +8,7 @@ const TutorialIframe = () => {
       </h3>
       <div className="relative overflow-hidden rounded-lg shadow-lg bg-gray-50">
         <iframe
-          src="https://res.cloudinary.com/dqyecrumn/video/upload/v1746292109/ttur3jopsmaxbdk6xbsv.mp4"
+          src="https://www.youtube.com/embed/K14n4wPr5Gs"
           width="100%"
           height="100%"
           allow="fullscreen"
