@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import PaymentDialog from './PaymentDialog';
+import InvoiceDialog from './InvoiceDialog';
 
 export default function Hero() {
   const [paymentOpen, setPaymentOpen] = useState(false);
+  const [invoiceOpen, setInvoiceOpen] = useState(false);
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -93,6 +95,12 @@ export default function Hero() {
             >
               Already Paid? Login Here
             </Link>
+            {/* <button
+              onClick={() => setInvoiceOpen(true)}
+              className="btn btn-outline-light cursor-pointer"
+            >
+              Check Invoice Status
+            </button> */}
           </div>}
         </div>
       </section>
@@ -100,6 +108,12 @@ export default function Hero() {
       <PaymentDialog
         open={paymentOpen}
         onClose={() => setPaymentOpen(false)}
+        amount={applicationFee}
+      />
+
+      <InvoiceDialog
+        open={invoiceOpen}
+        onClose={() => setInvoiceOpen(false)}
         amount={applicationFee}
       />
     </>
