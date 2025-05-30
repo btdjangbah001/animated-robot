@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import axiosInstance from '@/lib/axios';
 import PaymentDialog from './PaymentDialog';
 import InvoiceDialog from './InvoiceDialog';
 
 export default function Hero() {
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [invoiceOpen, setInvoiceOpen] = useState(false);
+  const [settings, setSettings] = useState({
+    startingDate: 0, closingDate: 0
+  });
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -16,29 +20,52 @@ export default function Hero() {
   });
   const applicationFee = "150";
 
-  // Set your target date here (YYYY, MM-1, DD)
-  const targetDate = new Date(2025, 4, 5, 10, 0, 0, 0).getTime();
-  const now = new Date().getTime();
-  const distance = targetDate - now;
+  // Memoize the fetch function
+  const fetchSettings = useCallback(async () => {
+    const response = await axiosInstance.get('/api/v1.0/public/settings');
+    const data = await response.data;
+    setSettings(data);
+  }, []);
+
+  // Calculate distance only when settings.startingDate changes
+  const distance = useMemo(() => {
+    const now = new Date().getTime();
+    return settings.startingDate - now;
+  }, [settings.startingDate]);
+
+  // Calculate distance only when settings.startingDate changes
+  const closeTime = useMemo(() => {
+    const now = new Date().getTime();
+    console.log(now, settings.closingDate, settings.closingDate - now);
+    return settings.closingDate - now;
+  }, [settings.closingDate]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    fetchSettings();
+  }, [fetchSettings]); // Only run once when component mounts
 
-      if (distance < 0) {
+  useEffect(() => {
+    if (settings.startingDate === 0) return; // Don't start timer until we have a date
+
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      const currentDistance = settings.startingDate - now;
+
+      if (currentDistance < 0) {
         clearInterval(timer);
         return;
       }
 
       setTimeLeft({
-        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((distance % (1000 * 60)) / 1000)
+        days: Math.floor(currentDistance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((currentDistance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((currentDistance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((currentDistance % (1000 * 60)) / 1000)
       });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [targetDate, distance]);
+  }, [settings.startingDate]); // Only restart timer when startingDate changes
 
   return (
     <>
@@ -83,12 +110,12 @@ export default function Hero() {
               </div>
             </div>
           </div> : <div className="flex flex-col md:flex-row justify-center gap-5 mt-8">
-            <button
+            {closeTime > 0 && <button
               onClick={() => setPaymentOpen(true)}
               className="btn btn-primary cursor-pointer"
             >
               Make Payment & Register
-            </button>
+            </button>}
             <Link
               href="/portal/login"
               className="btn btn-secondary"

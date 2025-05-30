@@ -57,7 +57,7 @@ export default function Header() {
       <DocxPreviewDialog
         open={open}
         onClose={() => setOpen(false)}
-        file={'https://res.cloudinary.com/drntdazzu/raw/upload/v1745973039/tests/ADMISSION_REQUIREMENTS_cpuork.docx'}
+        file={'https://res.cloudinary.com/drntdazzu/raw/upload/v1748613535/tests/ADMISSION_REQUIREMENTS_cpuork_yecuqx.docx'}
         title="Eligibility Requirements for Admission"
       />
     </>
