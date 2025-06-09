@@ -75,6 +75,10 @@ export default function Hero() {
           backgroundImage: "url('https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')"
         }}
       >
+        {/* Extension Banner */}
+        <div className="absolute top-0 left-0 right-0 bg-yellow-500 text-black py-2 px-4 text-center font-bold z-20">
+          FORM SALE EXTENDED TO MAY 14TH, 2025
+        </div>
         <div className="absolute inset-0 bg-[rgba(0,86,17,0.95)]"></div>
         <div className="container relative z-10 max-w-4xl">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">Welcome to the Ministry of Health Admission Portal</h2>
