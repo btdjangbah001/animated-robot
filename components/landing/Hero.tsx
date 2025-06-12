@@ -77,7 +77,7 @@ export default function Hero() {
       >
         {/* Extension Banner */}
         <div className="absolute top-0 left-0 right-0 bg-yellow-500 text-black py-2 px-4 text-center font-bold z-20">
-          FORM SALE EXTENDED TO MAY 14TH, 2025
+          SALES OF FORMS CLOSED
         </div>
         <div className="absolute inset-0 bg-[rgba(0,86,17,0.95)]"></div>
         <div className="container relative z-10 max-w-4xl">
