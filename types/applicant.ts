@@ -138,11 +138,29 @@ export interface ApplicationOutput {
     applicationPin?: string | null;
     status: "PENDING" | "APPROVED" | "REJECTED" | "IN_REVIEW" | "NEW" | "FAILED_ELIGIBILITY" | "PASSED_ELIGIBILITY" | "INTERVIEW_SCHEDULED" | null;
     aggregateGrade?: number | string | null;
+    invitation: InvitationOutput | null;
 }
 
 export interface SettingsOutput {
     startingDate: number;
     closingDate: number;
+}
+
+export interface InvitationOutput {
+    status: string | null;
+    emailSent: boolean | null;
+    smsSent: boolean | null;
+    context: ContextOutput | null;
+}
+
+export interface ContextOutput {
+    date: string | null;
+    institution: string | null;
+    firstname: string | null;
+    lastname: string | null;
+    fee: number | null;
+    location: string | null;
+    time: string | null;
 }
 
 export type ApplicantData = ApplicantOutput;

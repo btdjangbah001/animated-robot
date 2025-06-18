@@ -28,7 +28,7 @@ const dropdownNavItems: {href: string, label: string, activeSlug: string}[] = []
 export function AppHeader() {
   const application = useApplicationStore(state => state.application);
   const fetchApplication = useApplicationStore(state => state.fetchApplication);
-  const logout = useAuthStore(state => state.logout);
+  const logout = useAuthStore(state => state.logout); 
   const pathname = usePathname();
 
   useEffect(() => {
@@ -55,6 +55,15 @@ export function AppHeader() {
         </Link>
 
         <div className="flex items-center gap-2 md:gap-4">
+
+          {/* Add acceptance status banner */}
+          {/* {application?.status === 'PASSED_ELIGIBILITY' && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" />
+              <span>Congratulations! Your interview is scheduled for {application?.invitation?.context?.date} {application?.invitation?.context?.time} at {application?.invitation?.context?.location}. Bring Original Certificate(s) Biometric Birth Certificate Testimonial (optional). Pay GHS {application?.invitation?.context?.fee}.</span>
+            </div>
+          )} */}
+
 
           <nav className="hidden md:flex items-center gap-1">
             {application?.status === 'IN_REVIEW' && headerNavItems.map((item) => {
