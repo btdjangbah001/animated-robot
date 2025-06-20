@@ -90,6 +90,7 @@ const ASPECT_RATIO_TOLERANCE = 0.1;
 
 const GHANA_CARD_REGEX = /^[A-Z]{3}-\d{9}-\d$/;
 const PHONE_REGEX = /^0\d{9}$/;
+const NAME_REGEX = /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð '-]+$/u;
 
 export function PersonalDetailsForm({
   onNext,
@@ -371,8 +372,14 @@ export function PersonalDetailsForm({
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!formState.firstName) newErrors.fullName = 'First name is required';
+    if (!formState.firstName) newErrors.firstName = 'First name is required';
+    if (formState.firstName.length < 2) newErrors.firstName = 'First name must be at least 2 characters';
+    if (formState.firstName.length > 30) newErrors.firstName = 'First name must be less than 30 characters';
+    if (!NAME_REGEX.test(formState.firstName)) newErrors.firstName = 'First name contains invalid characters';
     if (!formState.lastName) newErrors.lastName = 'Last name is required';
+    if (formState.lastName.length < 2) newErrors.lastName = 'First name must be at least 2 characters';
+    if (formState.lastName.length > 30) newErrors.lastName = 'First name must be less than 30 characters';
+    if (!NAME_REGEX.test(formState.lastName)) newErrors.lastName = 'First name contains invalid characters';
     if (!formState.email) newErrors.email = 'Email is required';
     if (!formState.phone || !PHONE_REGEX.test(formState.phone)) newErrors.phone = 'Please enter a valid mobile money number';
     if (formState.ghanaCardNumber && !GHANA_CARD_REGEX.test(formState.ghanaCardNumber)) newErrors.ghanaCardNumber = 'Please enter a valid Ghana card number';
@@ -387,10 +394,10 @@ export function PersonalDetailsForm({
       return;
     };
 
-    if (disable){
-      onNext();
-      return;
-    }
+    // if (disable){
+    //   onNext();
+    //   return;
+    // }
 
     if (!applicationId || !application?.applicant?.id) {
       toast.error("Application/Applicant ID not found.");
@@ -513,8 +520,11 @@ export function PersonalDetailsForm({
                 value={formState.firstName}
                 onChange={handleInputChange}
                 required
-                disabled={true}
+                disabled={false}
               />
+              {errors.firstName && (
+                  <p className="text-xs text-red-600 mt-1">{errors.firstName}</p>
+                )}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="lastName">
@@ -527,8 +537,11 @@ export function PersonalDetailsForm({
                 value={formState.lastName}
                 onChange={handleInputChange}
                 required
-                disabled={true}
+                disabled={false}
               />
+              {errors.lastName && (
+                  <p className="text-xs text-red-600 mt-1">{errors.lastName}</p>
+                )}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="ghanaCardNumber">Ghana Card Number</Label>
@@ -932,7 +945,7 @@ export function PersonalDetailsForm({
                   value={formState.email}
                   onChange={handleInputChange}
                   required
-                  disabled={true}
+                  disabled={false}
                 />
               </div>
             </div>
