@@ -213,11 +213,14 @@ export default function ApplicationFormPage() {
                           <CloudDownload className="h-5 w-5 text-green-600" />
                         </div>
                         <div>
-                          <h3 className="font-medium text-gray-800">Required Documents</h3>
+                          <h3 className="font-medium text-gray-800">Please come along with the following</h3>
                           <ul className="text-gray-600 list-disc pl-5">  {/* Adds bullet points and padding */}
-                            <li>Original Certificate(s)</li>
-                            <li>Biometric Birth Certificate</li>
-                            <li>Testimonial (optional)</li>
+                            <li>Orginal Wassce certificate or results.</li>
+                            <li>Original biometric birth certificate.</li>
+                            <li>Ghana card.</li>
+                            <li>Printed application form.</li>
+                            <li>passport picture.</li>
+                            <li>photocopies of all listed document.</li>
                           </ul>
                         </div>
                       </div>

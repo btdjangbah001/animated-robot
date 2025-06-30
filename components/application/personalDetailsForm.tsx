@@ -394,10 +394,10 @@ export function PersonalDetailsForm({
       return;
     };
 
-    // if (disable){
-    //   onNext();
-    //   return;
-    // }
+    if (disable){
+      onNext();
+      return;
+    }
 
     if (!applicationId || !application?.applicant?.id) {
       toast.error("Application/Applicant ID not found.");
@@ -520,7 +520,7 @@ export function PersonalDetailsForm({
                 value={formState.firstName}
                 onChange={handleInputChange}
                 required
-                disabled={false}
+                disabled={true}
               />
               {errors.firstName && (
                   <p className="text-xs text-red-600 mt-1">{errors.firstName}</p>
@@ -537,7 +537,7 @@ export function PersonalDetailsForm({
                 value={formState.lastName}
                 onChange={handleInputChange}
                 required
-                disabled={false}
+                disabled={true}
               />
               {errors.lastName && (
                   <p className="text-xs text-red-600 mt-1">{errors.lastName}</p>
