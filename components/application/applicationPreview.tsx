@@ -404,9 +404,9 @@ export function ApplicationPreview({
           <Button type="button" variant="outline" onClick={onBack} disabled={isLoading}> <ArrowLeft className="mr-2 h-4 w-4" /> Back </Button>
           {disable ?
               (<Link key='Download Form' href='/portal/download' passHref>
-                <Button type="button" className="bg-green-500 hover:bg-green-600">Print Application<Send className="ml-2 h-4 w-4" /> </Button>
+                <Button type="button" className="bg-primary hover:bg-[#222142]">Print Application<Send className="ml-2 h-4 w-4" /> </Button>
               </Link>)
-              : (<Button type="button" className="bg-green-500 hover:bg-green-600" onClick={()=>setModalOpen(true)} disabled={isLoading}> {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Submit Application <Send className="ml-2 h-4 w-4" /> </Button>)}
+              : (<Button type="button" className="bg-primary hover:bg-[#222142]" onClick={()=>setModalOpen(true)} disabled={isLoading}> {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Submit Application <Send className="ml-2 h-4 w-4" /> </Button>)}
         </div>
       )}
       <Warning open={modalOpen} setOpen={setModalOpen} onProceed={onSubmit}/>

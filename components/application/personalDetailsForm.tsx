@@ -516,7 +516,7 @@ export function PersonalDetailsForm({
               <Input
                 id="firstName"
                 name="firstName"
-                className="focus:ring-green-500"
+                className="focus:ring-primary"
                 value={formState.firstName}
                 onChange={handleInputChange}
                 required
@@ -533,7 +533,7 @@ export function PersonalDetailsForm({
               <Input
                 id="lastName"
                 name="lastName"
-                className="focus:ring-green-500"
+                className="focus:ring-primary"
                 value={formState.lastName}
                 onChange={handleInputChange}
                 required
@@ -548,7 +548,7 @@ export function PersonalDetailsForm({
               <Input
                 id="ghanaCardNumber"
                 name="ghanaCardNumber"
-                className="focus:ring-green-500"
+                className="focus:ring-primary"
                 value={formState.ghanaCardNumber}
                 onChange={handleInputChange}
                 disabled={isLoading || disable}
@@ -568,7 +568,7 @@ export function PersonalDetailsForm({
                 required
                 disabled={isLoading || disable}
               >
-                <SelectTrigger id="gender" className="w-full focus:ring-green-500">
+                <SelectTrigger id="gender" className="w-full focus:ring-primary">
                   <SelectValue placeholder="Select Gender" />
                 </SelectTrigger>
                 <SelectContent>
@@ -591,7 +591,7 @@ export function PersonalDetailsForm({
                 value={formState.dob}
                 onChange={handleInputChange}
                 required
-                className="block w-full focus:ring-green-500"
+                className="block w-full focus:ring-primary"
                 disabled={isLoading || disable}
               />
             </div>
@@ -602,7 +602,7 @@ export function PersonalDetailsForm({
               <Input
                 id="birthPlace"
                 name="birthPlace"
-                className="focus:ring-green-500"
+                className="focus:ring-primary"
                 value={formState.birthPlace}
                 onChange={handleInputChange}
                 required
@@ -622,7 +622,7 @@ export function PersonalDetailsForm({
                   required
                   disabled={isLoading || disable}
               >
-                <SelectTrigger id="country" className="w-full focus:ring-green-500">
+                <SelectTrigger id="country" className="w-full focus:ring-primary">
                   <SelectValue placeholder="Select Country" />
                 </SelectTrigger>
                 <SelectContent>
@@ -647,7 +647,7 @@ export function PersonalDetailsForm({
                 required
                 disabled={isLoading || disable}
               >
-                <SelectTrigger id="nationality" className="w-full focus:ring-green-500">
+                <SelectTrigger id="nationality" className="w-full focus:ring-primary">
                   <SelectValue placeholder="Select Nationality" />
                 </SelectTrigger>
                 <SelectContent>
@@ -666,7 +666,7 @@ export function PersonalDetailsForm({
               <Input
                 id="languages"
                 name="languagesSpoken"
-                className="focus:ring-green-500"
+                className="focus:ring-primary"
                 value={formState.languagesSpoken}
                 onChange={handleInputChange}
                 required
@@ -809,7 +809,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="address"
                   name="address"
-                  className="focus:ring-green-500"
+                  className="focus:ring-primary"
                   value={formState.address}
                   onChange={handleInputChange}
                   required
@@ -823,7 +823,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="city"
                   name="city"
-                  className="focus:ring-green-500"
+                  className="focus:ring-primary"
                   value={formState.city}
                   onChange={handleInputChange}
                   required
@@ -843,7 +843,7 @@ export function PersonalDetailsForm({
                   required
                   disabled={isLoading || loadingRegions || disable}
                 >
-                  <SelectTrigger id="contactRegionId" className="w-full focus:ring-green-500">
+                  <SelectTrigger id="contactRegionId" className="w-full focus:ring-primary">
                     <SelectValue placeholder="Select Region" />
                   </SelectTrigger>
                   <SelectContent>
@@ -879,7 +879,7 @@ export function PersonalDetailsForm({
                     !formState.contactRegionId
                   }
                 >
-                  <SelectTrigger id="contactDistrictId" className="w-full focus:ring-green-500">
+                  <SelectTrigger id="contactDistrictId" className="w-full focus:ring-primary">
                     <SelectValue
                       placeholder={
                         !formState.contactRegionId
@@ -908,7 +908,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="digitalAddress"
                   name="digitalAddress"
-                  className="focus:ring-green-500"
+                  className="focus:ring-primary"
                   value={formState.digitalAddress}
                   onChange={handleInputChange}
                   placeholder="e.g. GA-123-4567"
@@ -923,7 +923,7 @@ export function PersonalDetailsForm({
                   id="phone"
                   name="phone"
                   type="tel"
-                  className="focus:ring-green-500"
+                  className="focus:ring-primary"
                   value={formState.phone}
                   onChange={handleInputChange}
                   required
@@ -940,7 +940,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="email"
                   name="email"
-                  className="focus:ring-green-500"
+                  className="focus:ring-primary"
                   type="email"
                   value={formState.email}
                   onChange={handleInputChange}
@@ -965,7 +965,7 @@ export function PersonalDetailsForm({
                 <Input
                   id="parentName"
                   name="parentName"
-                  className="focus:ring-green-500"
+                  className="focus:ring-primary"
                   value={formState.parentName}
                   onChange={handleInputChange}
                   required
@@ -980,7 +980,7 @@ export function PersonalDetailsForm({
                   id="parentContact"
                   name="parentContact"
                   type="tel"
-                  className="focus:ring-green-500"
+                  className="focus:ring-primary"
                   value={formState.parentContact}
                   onChange={handleInputChange}
                   required
@@ -1005,7 +1005,7 @@ export function PersonalDetailsForm({
             </Button>
             <Button
               type="submit"
-              className="bg-green-500 hover:bg-green-600"
+              className="bg-primary hover:bg-[#222142]"
               disabled={isLoading}
             >
               {" "}

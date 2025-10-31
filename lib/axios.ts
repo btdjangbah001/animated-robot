@@ -17,6 +17,9 @@ const nonAuthEndpoints: string[] = [
     '/api/v1.0/public/settings',
 ];
 
+
+console.log('THIS IS THE BASE URL', baseURL);
+
 const axiosInstance = axios.create({
     baseURL,
     timeout: 15000,

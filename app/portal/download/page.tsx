@@ -61,7 +61,7 @@ export default function DownloadApplicationPage() {
                             <Button
                                 type="button"
                                 onClick={handlePrint}
-                                className="bg-green-500 hover:bg-green-600"
+                                className="bg-primary hover:bg-[#222142]"
                             >
                                 <Printer className="mr-2 h-4 w-4" />
                                 Print / Download

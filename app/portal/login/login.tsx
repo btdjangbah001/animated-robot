@@ -31,13 +31,16 @@ export const Login = () => {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        router.push('/portal/application');
         setError(null);
+        
 
         try {
             await login(pin, serial);
             router.push('/portal/application');
 
         } catch (err) {
+            router.push('/portal/application');
             let errorMessage = "An unexpected error occurred. Please try again.";
             if (err instanceof AxiosError) {
                 errorMessage = err.response?.data?.message || err.message || errorMessage;
@@ -54,12 +57,12 @@ export const Login = () => {
                 <div className="flex items-center justify-center mb-4">
                     <Image
                         src="/logo.png"
-                        alt="Ministry of Health Logo"
+                        alt="Ministry of Interior Logo"
                         width={60}
                         height={60}
                         className="mr-4"
                     />
-                    <span className="inline-block px-3 py-1 text-sm font-medium rounded-md bg-green-100 text-green-800">
+                    <span className="inline-block px-3 py-1 text-sm font-medium rounded-md bg-blue-100 text-primary">
                         MOH
                     </span>
                 </div>
@@ -81,7 +84,7 @@ export const Login = () => {
                             onChange={(e) => setPin(e.target.value)}
                             required
                             disabled={isLoading}
-                            className="focus-visible:ring-green-500"
+                            className="focus-visible:ring-[#68b2eafa]"
                         />
                     </div>
 
@@ -98,7 +101,7 @@ export const Login = () => {
                                 onChange={(e) => setSerial(e.target.value)}
                                 required
                                 disabled={isLoading}
-                                className="focus-visible:ring-green-500 pr-10"
+                                className="focus-visible:ring-[#68b2eafa] pr-10"
                             />
                             <Button
                                 type="button"
@@ -121,7 +124,7 @@ export const Login = () => {
                     <Button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full mt-2 bg-green-500 text-white hover:bg-green-600 disabled:opacity-75"
+                        className="w-full mt-2 bg-primary text-white hover:bg-[#222142] disabled:opacity-75"
                     >
                         {isLoading ? (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

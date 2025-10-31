@@ -45,9 +45,9 @@ export function AppHeader() {
   return (
       <header className="flex flex-wrap items-center justify-between gap-y-4 mb-8 pb-4 border-b border-gray-200">
         <Link href="/" className="flex items-center gap-3 group">
-          <GraduationCap className="h-8 w-8 text-green-500 group-hover:text-green-600 transition-colors" />
+          <GraduationCap className="h-8 w-8 text-primary group-hover:text-[#222142] transition-colors" />
           <div>
-            <h1 className="text-xl font-bold text-green-600 group-hover:text-green-700 transition-colors">
+            <h1 className="text-xl font-bold text-[#222142] group-hover:text-[#131236] transition-colors">
               MOH HTI Portal
             </h1>
             <p className="text-sm text-gray-500">HTI Management System</p>
@@ -58,7 +58,7 @@ export function AppHeader() {
 
           {/* Add acceptance status banner */}
           {/* {application?.status === 'PASSED_ELIGIBILITY' && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2">
+            <div className="bg-[#e1ebf8] border border-[#b7cce5] text-[#131236] px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2">
               <CheckCircle className="h-4 w-4" />
               <span>Congratulations! Your interview is scheduled for {application?.invitation?.context?.date} {application?.invitation?.context?.time} at {application?.invitation?.context?.location}. Bring Original Certificate(s) Biometric Birth Certificate Testimonial (optional). Pay GHS {application?.invitation?.context?.fee}.</span>
             </div>
@@ -78,7 +78,7 @@ export function AppHeader() {
                         className={cn(
                             "h-9 px-3 flex items-center gap-2 cursor-pointer",
                             isActive
-                                ? "bg-green-50 text-green-700 font-semibold"
+                                ? "bg-[#e1ebf8] text-[#131236] font-semibold"
                                 : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         )}
                     >
@@ -112,8 +112,8 @@ export function AppHeader() {
               {dropdownNavItems.map((item) => {
                 const isActive = pathname === item.href || (item.activeSlug && pathname.startsWith(item.activeSlug));
                 return (
-                    <DropdownMenuItem key={item.label} asChild className={cn(isActive && 'bg-green-50')}>
-                      <Link href={item.href} className={cn("flex items-center gap-2 cursor-pointer w-full", isActive ? 'text-green-700 font-medium' : 'text-gray-700')}>
+                    <DropdownMenuItem key={item.label} asChild className={cn(isActive && 'bg-[#e1ebf8]')}>
+                      <Link href={item.href} className={cn("flex items-center gap-2 cursor-pointer w-full", isActive ? 'text-[#131236] font-medium' : 'text-gray-700')}>
                         {/* {item.icon && <item.icon className="h-4 w-4" />} */}
                         <span>{item.label}</span>
                       </Link>
@@ -127,8 +127,8 @@ export function AppHeader() {
                   if (!item.label || !item.icon) return null;
                   const isActive = pathname === item.href || (item.activeSlug && pathname.startsWith(item.activeSlug));
                   return (
-                      <DropdownMenuItem key={`mobile-${item.label}`} asChild className={cn(isActive && 'bg-green-50')}>
-                        <Link href={item.href} className={cn("flex items-center gap-2 cursor-pointer w-full", isActive ? 'text-green-700 font-medium' : 'text-gray-700')}>
+                      <DropdownMenuItem key={`mobile-${item.label}`} asChild className={cn(isActive && 'bg-[#e1ebf8]')}>
+                        <Link href={item.href} className={cn("flex items-center gap-2 cursor-pointer w-full", isActive ? 'text-[#131236] font-medium' : 'text-gray-700')}>
                           <item.icon className="h-4 w-4" />
                           <span>{item.label}</span>
                         </Link>

@@ -229,7 +229,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
               >
                 <SelectTrigger
                   id="program-type"
-                  className="w-full focus:ring-green-500"
+                  className="w-full focus:ring-primary"
                 >
                   {" "}
                   <SelectValue placeholder="Select program type..." />{" "}
@@ -263,7 +263,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
               >
                 <SelectTrigger
                   id="institution"
-                  className="w-full focus:ring-green-500"
+                  className="w-full focus:ring-primary"
                 >
                   {" "}
                   <SelectValue
@@ -303,7 +303,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
               >
                 <SelectTrigger
                   id="program"
-                  className="w-full focus:ring-green-500"
+                  className="w-full focus:ring-primary"
                 >
                   {" "}
                   <SelectValue
@@ -333,7 +333,7 @@ export function ProgramDetailsForm({ onNext }: ProgramDetailsFormProps) {
           <div className="flex justify-end mt-8">
             <Button
               type="submit"
-              className="bg-green-500 hover:bg-green-600"
+              className="bg-primary hover:bg-[#222142]"
               disabled={isLoading || !selectedProgramId || !applicationId}
             >
               {" "}

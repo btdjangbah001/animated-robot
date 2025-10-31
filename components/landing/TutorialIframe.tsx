@@ -4,7 +4,7 @@ const TutorialIframe = () => {
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        How to register and apply to a health training institution
+        How to register and apply to a police training institution
       </h3>
       <div className="relative overflow-hidden rounded-lg shadow-lg bg-gray-50">
         <iframe

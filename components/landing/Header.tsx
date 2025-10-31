@@ -9,19 +9,19 @@ export default function Header() {
   
   return (
     <>
-      <header className="bg-gradient-to-r from-[#46b3a8] to-[#00a73f] text-white py-3 md:py-5 shadow-md">
+      <header className="bg-gradient-to-r from-[#4a7bb8] to-[#11386e] text-white py-3 md:py-5 shadow-md">
         <div className="container px-4 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
           <div className='flex items-center w-full md:w-auto justify-between'>
             <div className="flex items-center">
               <Image 
                 src="/logo.png" 
-                alt="Ministry of Health Logo" 
+                alt="Ministry of Interior Logo" 
                 width={60} 
                 height={60} 
                 className="mr-4"
               />
               <div>
-                <h1 className="text-2xl font-semibold">Ministry of Health</h1>
+                <h1 className="text-2xl font-semibold">Ministry of Interior</h1>
                 <p className="text-sm opacity-90">Admission Portal {new Date().getFullYear()}</p>
               </div>
             </div>
@@ -29,9 +29,14 @@ export default function Header() {
           
           <Button
             variant="contained"
-            color="success"
             onClick={() => setOpen(true)}
-            sx={{ ml: 2 }}
+            sx={{ 
+              ml: 2,
+              backgroundColor: '#11386e',
+              '&:hover': {
+                backgroundColor: '#0d2d56',
+              },
+            }}
           >
             View Eligibility
           </Button>

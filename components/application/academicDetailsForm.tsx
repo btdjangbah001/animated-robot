@@ -567,7 +567,7 @@ export function AcademicDetailsForm({
               required
               disabled={isLoading || disable}
             >
-              <SelectTrigger id="application-type" className="w-full focus:ring-green-500">
+              <SelectTrigger id="application-type" className="w-full focus:ring-primary">
                 <SelectValue placeholder="Select application type" />
               </SelectTrigger>
               <SelectContent>
@@ -630,7 +630,7 @@ export function AcademicDetailsForm({
                       >
                         <SelectTrigger
                           id={`waecCourse-${subject.id}`}
-                          className="w-full focus:ring-green-500"
+                          className="w-full focus:ring-primary"
                         >
                           <SelectValue placeholder="Select Waec Course" />
                         </SelectTrigger>
@@ -682,7 +682,7 @@ export function AcademicDetailsForm({
                       >
                         <SelectTrigger
                           id={`subject-${subject.id}`}
-                          className="w-full focus:ring-green-500"
+                          className="w-full focus:ring-primary"
                         >
                           <SelectValue
                             placeholder={
@@ -730,7 +730,7 @@ export function AcademicDetailsForm({
                       >
                         <SelectTrigger
                           id={`grade-${subject.id}`}
-                          className="w-full focus:ring-green-500"
+                          className="w-full focus:ring-primary"
                         >
                           <SelectValue placeholder="Grade" />
                         </SelectTrigger>
@@ -768,7 +768,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading || disable}
-                        className="w-full focus:ring-green-500"
+                        className="w-full focus:ring-primary"
                       />
                     </div>
                     <div className="space-y-1.5 col-span-2 lg:col-span-1">
@@ -789,7 +789,7 @@ export function AcademicDetailsForm({
                         >
                           <SelectTrigger
                             aria-label="Exam Year"
-                            className="w-full focus:ring-green-500"
+                            className="w-full focus:ring-primary"
                           >
                             <SelectValue placeholder="Year" />
                           </SelectTrigger>
@@ -814,7 +814,7 @@ export function AcademicDetailsForm({
                         >
                           <SelectTrigger
                             aria-label="Exam Month"
-                            className="w-full focus:ring-green-500"
+                            className="w-full focus:ring-primary"
                           >
                             <SelectValue placeholder="Month" />
                           </SelectTrigger>
@@ -855,7 +855,7 @@ export function AcademicDetailsForm({
               <Button
                 type="button"
                 variant="outline"
-                className="text-green-700 border-green-300 bg-green-50 hover:bg-green-100 hover:text-green-800 hover:border-green-400"
+                className="text-[#131236] border-[#68b2eafa] bg-[#e1ebf8] hover:bg-[#d9e5f4] hover:text-[#222142] hover:border-[#3a5f91]"
                 onClick={addSubjectRow}
                 disabled={isLoading || disable}
               >
@@ -868,7 +868,7 @@ export function AcademicDetailsForm({
               <Button
                 type="button"
                 variant="outline"
-                className="text-green-700 border-green-300 bg-green-50 hover:bg-green-100 hover:text-green-800 hover:border-green-400"
+                className="text-[#131236] border-[#68b2eafa] bg-[#e1ebf8] hover:bg-[#d9e5f4] hover:text-[#222142] hover:border--[#3a5f91]"
                 onClick={addSubjectRow}
                 disabled={isLoading || disable}
               >
@@ -923,7 +923,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading || disable}
-                        className="w-full focus:ring-green-500"
+                        className="w-full focus:ring-primary"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -946,7 +946,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading || disable}
-                        className="w-full focus:ring-green-500"
+                        className="w-full focus:ring-primary"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -969,7 +969,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading || disable}
-                        className="w-full focus:ring-green-500"
+                        className="w-full focus:ring-primary"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -992,7 +992,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading || disable}
-                        className="w-full focus:ring-green-500"
+                        className="w-full focus:ring-primary"
                       />
                     </div>
                     <div className="flex justify-end items-end col-span-2 lg:col-span-1">
@@ -1022,7 +1022,7 @@ export function AcademicDetailsForm({
               <Button
                 type="button"
                 variant="outline"
-                className="text-green-700 border-green-300 bg-green-50 hover:bg-green-100 hover:text-green-800 hover:border-green-400"
+                className="text-[#131236] border-[#68b2eafa] bg-[#e1ebf8] hover:bg-[#d9e5f4] hover:text-[#222142] hover:border-[#3a5f91]"
                 onClick={addAcademicProfileRow}
                 disabled={isLoading || disable}
               >
@@ -1071,7 +1071,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading || disable}
-                        className="w-full focus:ring-green-500"
+                        className="w-full focus:ring-primary"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -1094,7 +1094,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading || disable}
-                        className="w-full focus:ring-green-500"
+                        className="w-full focus:ring-primary"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -1117,7 +1117,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading || disable}
-                        className="w-full focus:ring-green-500"
+                        className="w-full focus:ring-primary"
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -1140,7 +1140,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading || disable}
-                        className="w-full focus:ring-green-500"
+                        className="w-full focus:ring-primary"
                       />
                     </div>
                     <div className="flex justify-end items-end col-span-2 lg:col-span-1">
@@ -1170,7 +1170,7 @@ export function AcademicDetailsForm({
               <Button
                 type="button"
                 variant="outline"
-                className="text-green-700 border-green-300 bg-green-50 hover:bg-green-100 hover:text-green-800 hover:border-green-400"
+                className="text-[#131236] border-[#68b2eafa] bg-[#e1ebf8] hover:bg-[#d9e5f4] hover:text-[#222142] hover:border-[#3a5f91]"
                 onClick={addWorkExperienceRow}
                 disabled={isLoading || disable}
               >
@@ -1237,7 +1237,7 @@ export function AcademicDetailsForm({
                       >
                         <SelectTrigger
                           id={`core-grade-${subject.id}`}
-                          className="w-full focus:ring-green-500"
+                          className="w-full focus:ring-primary"
                         >
                           <SelectValue placeholder="Grade" />
                         </SelectTrigger>
@@ -1276,7 +1276,7 @@ export function AcademicDetailsForm({
                           )
                         }
                         disabled={isLoading || disable}
-                        className="w-full focus:ring-green-500"
+                        className="w-full focus:ring-primary"
                       />{" "}
                     </div>
                     <div className="space-y-1.5 col-span-2 lg:col-span-1">
@@ -1299,7 +1299,7 @@ export function AcademicDetailsForm({
                         >
                           <SelectTrigger
                             aria-label="Core Exam Year"
-                            className="w-full focus:ring-green-500"
+                            className="w-full focus:ring-primary"
                           >
                             <SelectValue placeholder="Year" />
                           </SelectTrigger>
@@ -1324,7 +1324,7 @@ export function AcademicDetailsForm({
                         >
                           <SelectTrigger
                             aria-label="Core Exam Month"
-                            className="w-full focus:ring-green-500"
+                            className="w-full focus:ring-primary"
                           >
                             <SelectValue placeholder="Month" />
                           </SelectTrigger>
@@ -1358,7 +1358,7 @@ export function AcademicDetailsForm({
             </Button>
             <Button
               type="submit"
-              className="bg-green-500 hover:bg-green-600"
+              className="bg-primary hover:bg-[#222142]"
               disabled={isLoading}
             >
               {" "}

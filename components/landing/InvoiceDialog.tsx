@@ -78,7 +78,7 @@ export default function InvoiceDialog({ open, onClose, amount }: InvoiceDialogPr
                   onChange={handleChange}
                   placeholder="Enter payment's invoice number"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                 />
                 {errors.invoiceNumber && (
                   <p className="text-xs text-red-600 mt-1">{errors.invoiceNumber}</p>

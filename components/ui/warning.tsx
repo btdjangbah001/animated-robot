@@ -45,7 +45,7 @@ export const Warning = ({ open, setOpen, onProceed }: WarningProps) => {
                     </Button>
                     <Button
                         onClick={handleProceed}
-                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 min-w-[100px] justify-center cursor-pointer"
+                        className="flex items-center gap-2 bg-[#222142] hover:bg-[#131236] min-w-[100px] justify-center cursor-pointer"
                         disabled={loading}
                     >
                         {loading ? "Processing..." : "Submit"}

@@ -61,7 +61,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
     try {
       setIsLoading(true);
       const response = await axiosInstance.post(
-        "/api/v1.0/public/make-payment",
+        "/api/v1.0/make-payment",
         {
           firstName: paymentData.firstName,
           lastName: paymentData.lastName,
@@ -127,7 +127,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   onChange={handleChange}
                   placeholder="Enter applicant's last name"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                 />
               </div>
               <div className="space-y-2">
@@ -144,7 +144,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   onChange={handleChange}
                   placeholder="Enter applicant's given names"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                 />
               </div>
               
@@ -163,7 +163,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   onChange={handleChange}
                   placeholder="Enter applicant's email address"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                 />
               </div>
               <div className="space-y-2">
@@ -181,7 +181,7 @@ export default function PaymentDialog({ open, onClose, amount }: PaymentDialogPr
                   value={paymentData.mobileMoneyNumber}
                   onChange={handleChange}
                   placeholder="Enter your mobile money number"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm"
                 />
                 {errors.mobileMoneyNumber && (
                   <p className="text-xs text-red-600 mt-1">{errors.mobileMoneyNumber}</p>

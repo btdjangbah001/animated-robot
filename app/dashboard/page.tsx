@@ -5,7 +5,7 @@ import Hero from "@/components/landing/Hero";
 import Features from "@/components/landing/Features";
 import Header from "@/components/landing/Header";
 import FAQ from "@/components/landing/Faq";
-import TutorialIframe from "@/components/landing/TutorialIframe";
+// import TutorialIframe from "@/components/landing/TutorialIframe";
 
 export default function DashboardPage() {
 
@@ -14,7 +14,7 @@ export default function DashboardPage() {
       <Header />
       <main className="flex-grow">
         <Hero />
-        <TutorialIframe />
+        {/* <TutorialIframe /> */}
         <FAQ />
         <Features />
       </main>

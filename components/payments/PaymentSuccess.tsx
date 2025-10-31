@@ -31,7 +31,7 @@ const PaymentSuccess: React.FC<PaymentSuccessProps> = ({
       }}>
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           {/* Optional: Add your logo here */}
-          <Image src="/logo.png" alt="Ministry of Health Logo" width={60} height={60}className="mr-4" />
+          <Image src="/logo.png" alt="Ministry of Interior Logo" width={60} height={60}className="mr-4" />
         </div>
         
         <div style={{

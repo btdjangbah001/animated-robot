@@ -23,7 +23,7 @@ export default function Features() {
           <div className="text-center mb-12">
             <h3 className="section-title h3">Why Choose Our Programs</h3>
             <p className="section-title p">
-              Our admission process is designed to be simple, transparent, and efficient to help you focus on what matters - your healthcare education.
+              Our admission process is designed to be simple, transparent, and efficient to help you focus on what matters.
             </p>
           </div>
           

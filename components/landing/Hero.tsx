@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import axiosInstance from '@/lib/axios';
 import PaymentDialog from './PaymentDialog';
@@ -12,12 +12,12 @@ export default function Hero() {
   const [settings, setSettings] = useState({
     startingDate: 0, closingDate: 0
   });
-  const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  });
+  // const [timeLeft, setTimeLeft] = useState({
+  //   days: 0,
+  //   hours: 0,
+  //   minutes: 0,
+  //   seconds: 0
+  // });
   const applicationFee = "150";
 
   // Memoize the fetch function
@@ -28,17 +28,17 @@ export default function Hero() {
   }, []);
 
   // Calculate distance only when settings.startingDate changes
-  const distance = useMemo(() => {
-    const now = new Date().getTime();
-    return settings.startingDate - now;
-  }, [settings.startingDate]);
+  // const distance = useMemo(() => {
+  //   const now = new Date().getTime();
+  //   return settings.startingDate - now;
+  // }, [settings.startingDate]);
 
   // Calculate distance only when settings.startingDate changes
-  const closeTime = useMemo(() => {
-    const now = new Date().getTime();
-    console.log(now, settings.closingDate, settings.closingDate - now);
-    return settings.closingDate - now;
-  }, [settings.closingDate]);
+  // const closeTime = useMemo(() => {
+  //   const now = new Date().getTime();
+  //   console.log(now, settings.closingDate, settings.closingDate - now);
+  //   return settings.closingDate - now;
+  // }, [settings.closingDate]);
 
   useEffect(() => {
     fetchSettings();
@@ -56,12 +56,12 @@ export default function Hero() {
         return;
       }
 
-      setTimeLeft({
-        days: Math.floor(currentDistance / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((currentDistance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((currentDistance % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((currentDistance % (1000 * 60)) / 1000)
-      });
+      // setTimeLeft({
+      //   days: Math.floor(currentDistance / (1000 * 60 * 60 * 24)),
+      //   hours: Math.floor((currentDistance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+      //   minutes: Math.floor((currentDistance % (1000 * 60 * 60)) / (1000 * 60)),
+      //   seconds: Math.floor((currentDistance % (1000 * 60)) / 1000)
+      // });
     }, 1000);
 
     return () => clearInterval(timer);
@@ -79,19 +79,19 @@ export default function Hero() {
         <div className="absolute top-0 left-0 right-0 bg-yellow-500 text-black py-2 px-4 text-center uppercase font-bold z-20">
           Log in to check your application status
         </div>
-        <div className="absolute inset-0 bg-[rgba(0,86,17,0.95)]"></div>
+        <div className="absolute inset-0 bg-[rgba(0,7,86,0.9)]"></div>
         <div className="container relative z-10 max-w-4xl">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Welcome to the Ministry of Health Admission Portal</h2>
-          <p className="text-lg mb-8 opacity-95">
-            Begin your journey in healthcare education with our streamlined admission process.
-            Join thousands of successful applicants who have launched their medical careers through our programs.
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Welcome to the Ministry of Interior Admission Portal</h2>
+          <p className="text-lg mb-8 opacity-95 text-gray-200">
+            This is the official admissions portal of the Ghana Police School.
+            Start your application today and take the next step toward your law enforcement career.
           </p>
 
           <div className="price-tag">
             Application Fee: GHS{applicationFee}
           </div>
 
-          {distance > 0 ? <div className="mt-8">
+          {/* {distance > 0 ? <div className="mt-8">
             <div className="coming-soon-countdown">
               <h3 className="text-xl font-semibold mb-4">Portal Opening Soon</h3>
               <div className="flex justify-center gap-4">
@@ -113,13 +113,15 @@ export default function Hero() {
                 </div>
               </div>
             </div>
-          </div> : <div className="flex flex-col md:flex-row justify-center gap-5 mt-8">
-            {closeTime > 0 && <button
+          </div>  */}
+          
+          <div className="flex flex-col md:flex-row justify-center gap-5 mt-8">
+            <button
               onClick={() => setPaymentOpen(true)}
               className="btn btn-primary cursor-pointer"
             >
               Make Payment & Register
-            </button>}
+            </button>
             <Link
               href="/portal/login"
               className="btn btn-secondary"
@@ -132,7 +134,8 @@ export default function Hero() {
             >
               Check Invoice Status
             </button> */}
-          </div>}
+          </div>
+          {/* } */}
         </div>
       </section>
 

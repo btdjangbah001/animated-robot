@@ -27,9 +27,9 @@ export function ProgressSteps({ steps, currentStepId }: ProgressStepsProps) {
                 className={cn(
                   "flex h-8 w-8 items-center justify-center rounded-full font-semibold mb-2 transition-colors",
                   isCompleted
-                    ? "bg-green-500 text-white"
+                    ? "bg-primary text-white"
                     : isActive
-                      ? "bg-green-500 text-white"
+                      ? "bg-primary text-white"
                       : "bg-gray-300 text-gray-500",
                 )}
               >
@@ -38,7 +38,7 @@ export function ProgressSteps({ steps, currentStepId }: ProgressStepsProps) {
               <div
                 className={cn(
                   "text-xs sm:text-sm text-center font-medium",
-                  isActive ? "text-green-600" : "text-gray-500",
+                  isActive ? "text-[#222142]" : "text-gray-500",
                 )}
               >
                 {step.label}

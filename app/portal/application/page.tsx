@@ -144,7 +144,7 @@ export default function ApplicationFormPage() {
               />
               {isLoading && !application ? (
                   <div className="flex justify-center items-center py-10">
-                    <Loader2 className="h-16 w-16 animate-spin text-green-500" />
+                    <Loader2 className="h-16 w-16 animate-spin text-primary" />
                     <span className="ml-2 text-gray-600">Loading...</span>
                   </div>
               ) : (
@@ -156,7 +156,7 @@ export default function ApplicationFormPage() {
                       {[...Array(30)].map((_, i) => (
                         <div 
                           key={i}
-                          className="absolute w-2 h-2 bg-green-400 rounded-full animate-float"
+                          className="absolute w-2 h-2 bg-[#3a5f91] rounded-full animate-float"
                           style={{
                             left: `${Math.random() * 100}%`,
                             top: `${Math.random() * 100}%`,
@@ -168,8 +168,8 @@ export default function ApplicationFormPage() {
                     </div>
                     
                     <div className="relative z-10">
-                      <div className="bg-green-100 p-6 rounded-full inline-block mb-6">
-                        <CheckCircle className="h-16 w-16 text-green-600" />
+                      <div className="bg-[#d9e5f4] p-6 rounded-full inline-block mb-6">
+                        <CheckCircle className="h-16 w-16 text-[#222142]" />
                       </div>
                       <h1 className="text-4xl font-bold text-gray-900 mb-4">Congratulations!</h1>
                       <p className="text-xl text-gray-600 mb-8">
@@ -182,8 +182,8 @@ export default function ApplicationFormPage() {
                     <h2 className="text-2xl font-semibold text-gray-800 mb-4">Your Interview Details</h2>
                     <div className="space-y-4">
                       <div className="flex items-start gap-4">
-                        <div className="bg-green-50 p-2 rounded-full">
-                          <CalendarDays className="h-5 w-5 text-green-600" />
+                        <div className="bg-[#e1ebf8] p-2 rounded-full">
+                          <CalendarDays className="h-5 w-5 text-[#222142]" />
                         </div>
                         <div>
                           <h3 className="font-medium text-gray-800">Interview Date</h3>
@@ -191,8 +191,8 @@ export default function ApplicationFormPage() {
                         </div>
                       </div>
                       <div className="flex items-start gap-4">
-                        <div className="bg-green-50 p-2 rounded-full">
-                          <MapPin className="h-5 w-5 text-green-600" />
+                        <div className="bg-[#e1ebf8] p-2 rounded-full">
+                          <MapPin className="h-5 w-5 text-[#222142]" />
                         </div>
                         <div>
                           <h3 className="font-medium text-gray-800">Location</h3>
@@ -200,8 +200,8 @@ export default function ApplicationFormPage() {
                         </div>
                       </div>
                       <div className="flex items-start gap-4">
-                        <div className="bg-green-50 p-2 rounded-full">
-                          <Clock className="h-5 w-5 text-green-600" />
+                        <div className="bg-[#e1ebf8] p-2 rounded-full">
+                          <Clock className="h-5 w-5 text-[#222142]" />
                         </div>
                         <div>
                           <h3 className="font-medium text-gray-800">Interview Fee</h3>
@@ -209,8 +209,8 @@ export default function ApplicationFormPage() {
                         </div>
                       </div>
                       <div className="flex items-start gap-4">
-                        <div className="bg-green-50 p-2 rounded-full">
-                          <CloudDownload className="h-5 w-5 text-green-600" />
+                        <div className="bg-[#e1ebf8] p-2 rounded-full">
+                          <CloudDownload className="h-5 w-5 text-[#222142]" />
                         </div>
                         <div>
                           <h3 className="font-medium text-gray-800">Please come along with the following</h3>
